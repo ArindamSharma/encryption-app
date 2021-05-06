@@ -92,115 +92,92 @@ def main():
 def main2():
     lightblue="lightblue"
 
+    # Root Window
     root = tk.Tk()
     root.title("Encryption/Decryption")
     root.geometry("800x580")
     root.configure(background=lightblue)
+
+    # Pre Define Varibales
+    left_sec_hsize=(250,300)#(min,max)
     
+    #Functions
+    def resize(e):
+        print(e,left_sec.winfo_width())
+        # if(e.width<=left_sec_hsize[0]*2):
+        #     left_sec.config(width=left_sec_hsize[0])
+        #     # left_sec.pack()
+        # elif(e.width>=left_sec_hsize[1]*2):
+        #     left_sec.config(width=left_sec_hsize[1])
+        #     # left_sec.pack()
+        # else:
+        #     left_sec.config(width=left_sec_hsize[0])
+        #     # left_sec.pack(expand=True)
+    
+    
+    #Root Frame
     root_frame=tk.Frame(root,background=lightblue)
     root_frame.pack(expand=True,fill=tk.BOTH)
-
+    root_frame.bind("<Configure>",resize)
 
     #Left Navigation
-    left_sec_hsize=(250,300)#(min,max)
-    left_sec=tk.Frame(root_frame,width=left_sec_hsize[0],background=lightblue)
-    left_sec.pack(side=tk.LEFT,expand=True,fill=tk.BOTH)
+    left_sec=tk.Frame(root_frame,width=250,background=lightblue)
+    left_sec.pack(side=tk.LEFT,fill=tk.BOTH)
     
-    left_sec_brand=tk.Frame(left_sec,height=8,background="medium purple")
-    left_sec_brand.pack(side=tk.TOP,expand=True,fill=tk.BOTH)
+    #left Nav Brand
+    left_sec_brand=tk.Frame(left_sec,background='saddle brown')
+    left_sec_brand.pack(side=tk.TOP,fill=tk.BOTH)
     
-    left_sec_brand_name=tk.Label(left_sec_brand,text="Encryptor/Decryptor",background="medium purple")
-    left_sec_brand_name.pack(side=tk.RIGHT,expand=True,fill=tk.BOTH)
+    left_sec_brand_name=tk.Label(left_sec_brand,text="Encryptor/Decryptor",background='saddle brown',fg="white",font=(fonts[0],12))
+    left_sec_brand_name.pack(side=tk.RIGHT,expand=True,fill=tk.BOTH,pady=10)
 
-    # def nav_button_press(e):
-    #     print(e)
-    # def nav_button_release(e):
-    #     print(e)
-    def nav_button_enter(e):
-        print(e)
-
-    def nav_button_leave(e):
-        print(e)
-
+    #Left Nav Menu
     left_sec_menu=tk.Frame(left_sec,background=color[7],height=10)
     left_sec_menu.pack(side=tk.BOTTOM,expand=True,fill=tk.BOTH)
 
     left_sec_menu_1=tk.Button(left_sec_menu,text="Encryptor a File",
-        background=color[7],
-        bd=0,
-        activebackground=color[7],
-        font=(fonts[0],12),
-        bg=color[7],
-    )
+    background=color[7], bd=0,activebackground=color[7],font=(fonts[0],12),fg="black",bg=color[7],)
     left_sec_menu_1.pack(fill=tk.X,padx=10,pady=15)
 
     left_sec_menu_2=tk.Button(left_sec_menu,text="Decryptor a File",
-        background=color[7],
-        bd=0,
-        activebackground=color[7],
-        font=(fonts[0],12),
-        bg=color[7],
-    )
+    background=color[7], bd=0,activebackground=color[7],font=(fonts[0],12),fg="black",bg=color[7],)
     left_sec_menu_2.pack(fill=tk.X,padx=10,pady=15)
 
-    left_sec_menu_3=tk.Button(left_sec_menu,text="Open Excrypted File",
-        background=color[7],
-        bd=0,
-        activebackground=color[7],
-        font=(fonts[0],12),
-        bg=color[7],
-    )
+    left_sec_menu_3=tk.Button(left_sec_menu,text="Open Encrypted File",
+    background=color[7], bd=0,activebackground=color[7],font=(fonts[0],12),fg="black",bg=color[7],)
     left_sec_menu_3.pack(fill=tk.X,padx=10,pady=15)
 
     left_sec_menu_4=tk.Button(left_sec_menu,text="Generate a Key",
-        background=color[7],
-        bd=0,
-        activebackground=color[7],
-        font=(fonts[0],12),
-        bg=color[7],
-    )
+    background=color[7], bd=0,activebackground=color[7],font=(fonts[0],12),fg="black",bg=color[7],)
     left_sec_menu_4.pack(fill=tk.X,padx=10,pady=15)
     
     left_sec_menu_5=tk.Button(left_sec_menu,text="Exit",
-        background=color[7],
-        bd=0,
-        activebackground=color[7],
-        font=(fonts[0],12),
-        bg=color[7],
-    )
+    background=color[7], bd=0,activebackground=color[7],font=(fonts[0],12),fg="black",bg=color[7],)
     left_sec_menu_5.pack(side=tk.BOTTOM,fill=tk.X,padx=10,pady=15)
 
-
-    left_sec_menu_1.bind("<Enter>",nav_button_enter)
-    left_sec_menu_2.bind("<Enter>",nav_button_enter)
-    left_sec_menu_3.bind("<Enter>",nav_button_enter)
-    left_sec_menu_4.bind("<Enter>",nav_button_enter)
-    left_sec_menu_5.bind("<Enter>",nav_button_enter)
-    left_sec_menu_1.bind("<Leave>",nav_button_leave)
-    left_sec_menu_2.bind("<Leave>",nav_button_leave)
-    left_sec_menu_3.bind("<Leave>",nav_button_leave)
-    left_sec_menu_4.bind("<Leave>",nav_button_leave)
-    left_sec_menu_5.bind("<Leave>",nav_button_leave)
-
+    left_sec_menu_1.bind("<Enter>",func=lambda e: left_sec_menu_1.config(fg="blue"))
+    left_sec_menu_2.bind("<Enter>",func=lambda e: left_sec_menu_2.config(fg="blue"))
+    left_sec_menu_3.bind("<Enter>",func=lambda e: left_sec_menu_3.config(fg="blue"))
+    left_sec_menu_4.bind("<Enter>",func=lambda e: left_sec_menu_4.config(fg="blue"))
+    left_sec_menu_5.bind("<Enter>",func=lambda e: left_sec_menu_5.config(fg="blue"))
+    left_sec_menu_1.bind("<Leave>",func=lambda e: left_sec_menu_1.config(fg="black"))
+    left_sec_menu_2.bind("<Leave>",func=lambda e: left_sec_menu_2.config(fg="black"))
+    left_sec_menu_3.bind("<Leave>",func=lambda e: left_sec_menu_3.config(fg="black"))
+    left_sec_menu_4.bind("<Leave>",func=lambda e: left_sec_menu_4.config(fg="black"))
+    left_sec_menu_5.bind("<Leave>",func=lambda e: left_sec_menu_5.config(fg="black"))
 
     #Right Section
     right_sec=tk.Frame(root_frame)
     right_sec.pack(side=tk.RIGHT,expand=True,fill=tk.BOTH)
 
-
-    def resize(e):
-        print(e,left_sec.winfo_width())
-        if(e.width<=left_sec_hsize[0]*2):
-            left_sec.config(width=left_sec_hsize[0])
-            left_sec.pack(expand=False)
-        elif(e.width>=left_sec_hsize[1]*2):
-            left_sec.config(width=left_sec_hsize[1])
-            left_sec.pack(expand=False)
-        else:
-            left_sec.config(width=left_sec_hsize[0])
-            left_sec.pack(expand=True)
+    right_sec_head=tk.Label(right_sec,text="Recent Files")
+    right_sec_head.pack(fill=tk.X,expand=True,side=tk.TOP)
+    
+    #Grid 
+    # recent_1=tk.Button(right_sec,text="Recent File",
+    # background=color[7], bd=0,activebackground=color[7],font=(fonts[0],12),fg="black",bg=color[7],)
+    # recent_1.pack(padx=10,ipady=40,ipadx=40)
             
-    root_frame.bind("<Configure>",resize)
     tk.mainloop()
 
 if __name__=="__main__":
