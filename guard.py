@@ -1,3 +1,8 @@
+from os import stat
+from tkinter import Checkbutton
+from tkinter.constants import BOTTOM, NONE
+
+
 def generate_key():
     key = Fernet.generate_key()
     with open("secret.key", "wb") as key_file:
@@ -28,7 +33,7 @@ if __name__=="__main__":
         import os
         print("Module Not Found ")
         print("Installing Module")
-        of2_text_area_scrollbar.system("pip install cryptography")
+        os.system("pip install cryptography")
         print("Complete Installation")
         print("Re-run the code")
     # generate_key()
@@ -37,7 +42,23 @@ if __name__=="__main__":
     
     # Pre Define Varibales
     file_extension=".secret"
-    theme_color=["black","grey"]
+    file_opened=None
+    theme_color1=["black","grey"]
+    theme_color2=[
+        "#2f3e46",
+        "#354f52",
+        "#52796f",
+        "#84a98c",
+        "#cad2c5",
+    ] # https://coolors.co/cad2c5-84a98c-52796f-354f52-2f3e46
+    theme_color3=[
+        "#0a0908",
+        "#22333b",
+        "#5e503f",
+        "#c6ac8f",
+        "#eae0d5",
+    ] # https://coolors.co/0a0908-22333b-eae0d5-c6ac8f-5e503f
+
     theme_font=["theme_color[0]"]
     # f1_left_sec_hsize=(250,300)#(min,max)
 
@@ -45,7 +66,7 @@ if __name__=="__main__":
     root = tk.Tk()
     root.title("Encryption/Decryption")
     root.geometry("800x580")
-    root.configure(background=theme_color[0])
+    # root.configure(background=theme_color1[0])
     root.grid_columnconfigure(0, weight=1)
     root.grid_rowconfigure(0, weight=1)
     
@@ -70,26 +91,29 @@ if __name__=="__main__":
     #     # #     f1_left_sec.pack(expand=True)
 
     def encrypt_open_file():
-        filedialog.askopenfilename(
-            initialdir = "/",
-            title = "Select a File ",
-            filetypes = (
-                ("Text files","*.txt*"),
-                ("all files","*.*")
-            ),
-        )
+        root_open_close_file_frame.tkraise()
+        # filedialog.askopenfilename(
+        #     initialdir = "/",
+        #     title = "Select a File ",
+        #     filetypes = (
+        #         ("Text files","*.txt*"),
+        #         ("all files","*.*")
+        #     ),
+        # )
 
     def decrypt_open_file():
-        filedialog.askopenfilename(
-            initialdir = "/",
-            title = "Select an Encrypted File ",
-            filetypes = (
-                ("Secret files","*"+file_extension+"*"),
-                # ("all files","*.*")
-            ),
-        )
+        root_open_close_file_frame.tkraise()
+        # filedialog.askopenfilename(
+        #     initialdir = "/",
+        #     title = "Select an Encrypted File ",
+        #     filetypes = (
+        #         ("Secret files","*"+file_extension+"*"),
+        #         # ("all files","*.*")
+        #     ),
+        # )
 
     def open_encrypt_file():
+        global file_opened
         filename=filedialog.askopenfilename(
             # initialdir = "/",
             title = "Select an Encrypted File ",
@@ -99,16 +123,20 @@ if __name__=="__main__":
             ),
         )
         if(filename):
+            file_opened=filename
+            # print(file_opened)
             root_editor_frame.tkraise()
             f2_head_label.config(text="Text Editor : Selected File :- "+filename.split("/")[-1])
-            data=open(filename,"rb+")
+            data=open(file_opened,"rb+")
+            # f2_test_area.insert(tk.END, decrypt_message(data.read()))
             f2_test_area.insert(tk.END, data.read())
             data.close()
 
     def open_editor():
+        # f2_open_button.config(state=tk.NORMAL)
         root_editor_frame.tkraise()
 
-    def button_generate():
+    def button_generate_key():
         pass
 
     def save(data):
@@ -120,72 +148,165 @@ if __name__=="__main__":
         f2_test_area.insert(tk.END, data.read())
         print("File Saved")
 
-    def clear():
-        f2_test_area.delete(1.0,tk.END)
+    def f3_back_button_pressed():
+        root_open_close_file_frame.tkraise()
 
-    def keyrelease(e):
-        print(e)
+    def f2_back_button_pressed():
+        global file_opened
+        f2_test_area.delete(1.0,tk.END) # For clearing 
+        f2_head_label.config(text="Text Editor : No File Selected ")
+        # if(file_opened):
+            # f2_save_button_pressed()
+        f2_save_button.config(state=tk.DISABLED)
+        file_opened=None
+        root_home_frame.tkraise()
 
-    def keypress(e):
-        print(e)
-
-    def editor(filename,askfile=False):
-        data=open(filename,"rb+")
-        # f2_test_area.insert(tk.END, decrypt_message(data.read()))
+    def f2_save_button_pressed():
+        print("Saveing button Pressed")
+        data=open(file_opened,"rb+")
+        data.seek(0)
+        data.truncate(0)
+        data.write(f2_test_area.get(1.0,tk.END).encode())
+        # data.write(encrypt_message(f2_test_area.get(1.0,tk.END)).encode())
         f2_test_area.insert(tk.END, data.read())
         data.close()
-    def f2_back_button_pressed():
-        save()
-        root_home_frame.tkraise()
+        print("File Saved")
+        pass
+
+    def f2_open_button_pressed():
+        global file_opened
+        # if(file_opened):
+        #     f2_save_button_pressed()
+        filename=filedialog.askopenfilename(
+            # initialdir = "/",
+            title = "Select an Encrypted File ",
+            filetypes = (
+                ("all files","*.*"),
+                # ("Secret files","*"+file_extension+"*"),
+            ),
+        )
+        if(filename):
+            f2_test_area.delete(1.0,tk.END)
+            file_opened=filename
+            # root_editor_frame.tkraise()
+            f2_head_label.config(text="Text Editor : Selected File :- "+filename.split("/")[-1])
+            f2_save_button.config(state=tk.NORMAL)
+            
+            data=open(filename,"rb+")
+            # f2_test_area.insert(tk.END, decrypt_message(data.read()))
+            f2_test_area.insert(tk.END, data.read())
+            data.close()
+
+    def color_theme(theme_color):   
+        # Background 
+        
+        # Root
+        root.configure(background=theme_color[0])
+
+        # Root Home F1 
+        root_home_frame.config(background=theme_color[0])
+        f1_left_sec_brand.config(background=theme_color[0])
+        f1_left_sec_brand_name.config(background=theme_color[0])
+        f1_left_sec_menu.config(background=theme_color[1])
+        for i in [f1_left_sec_menu_1,f1_left_sec_menu_2,f1_left_sec_menu_3,f1_left_sec_menu_4,f1_left_sec_menu_0,f1_left_sec_menu_5]:
+            i.config(background=theme_color[1],activebackground=theme_color[1])
+        
+        f1_right_sec.config(background=theme_color[-1])
+        root_editor_frame.config(background=theme_color[0])
+        
+        # Root Editor F2
+        f2_back_button.config(background=theme_color[0],activebackground=theme_color[0])
+        f2_back_button.bind("<Enter>",func=lambda e: f2_back_button.config(bg=theme_color[-2],fg=theme_color[0]))
+        f2_back_button.bind("<Leave>",func=lambda e: f2_back_button.config(bg=theme_color[0],fg=theme_color[-1]))
+
+        f2_open_button.config(background=theme_color[0],activebackground=theme_color[0])
+        f2_open_button.bind("<Enter>",func=lambda e: f2_open_button.config(bg=theme_color[-2],fg=theme_color[0]))
+        f2_open_button.bind("<Leave>",func=lambda e: f2_open_button.config(bg=theme_color[0],fg=theme_color[-1]))
+
+        f2_save_button.config(background=theme_color[0],activebackground=theme_color[0])
+        f2_save_button.bind("<Enter>",func=lambda e: f2_save_button.config(bg=theme_color[-2],fg=theme_color[0]))
+        f2_save_button.bind("<Leave>",func=lambda e: f2_save_button.config(bg=theme_color[0],fg=theme_color[-1]))
+
+        f2_head_label.config(background=theme_color[0])
+
+        f2_test_area.config(background=theme_color[-1],selectbackground=theme_color[-2])
+        f2_text_box_frame.config(bg="Black")
+        # f2_text_area_scrollbar.config(bg="#ce4257")
+
+        #Root Open Close Frame F3
+        root_open_close_file_frame.config(background=theme_color[-1])
+        f3_back_button.config(background=theme_color[0],activebackground=theme_color[0])
+        f3_back_button.bind("<Enter>",func=lambda e: f3_back_button.config(bg=theme_color[-2],fg=theme_color[0]))
+        f3_back_button.bind("<Leave>",func=lambda e: f3_back_button.config(bg=theme_color[0],fg=theme_color[-1]))
+        
+        f3_head_label.config(background=theme_color[0])
+
+        # Text Color
+
+        # Root Home F1
+        f1_left_sec_brand_name.config(fg=theme_color[-1])
+        for i in [f1_left_sec_menu_1,f1_left_sec_menu_2,f1_left_sec_menu_3,f1_left_sec_menu_4,f1_left_sec_menu_0,f1_left_sec_menu_5]:
+            i.config(fg=theme_color[-1])
+            
+        f1_left_sec_menu_0.bind("<Enter>",func=lambda e: f1_left_sec_menu_0.config(fg=theme_color[2]))
+        f1_left_sec_menu_1.bind("<Enter>",func=lambda e: f1_left_sec_menu_1.config(fg=theme_color[2]))
+        f1_left_sec_menu_2.bind("<Enter>",func=lambda e: f1_left_sec_menu_2.config(fg=theme_color[2]))
+        f1_left_sec_menu_3.bind("<Enter>",func=lambda e: f1_left_sec_menu_3.config(fg=theme_color[2]))
+        f1_left_sec_menu_4.bind("<Enter>",func=lambda e: f1_left_sec_menu_4.config(fg=theme_color[2]))
+        f1_left_sec_menu_5.bind("<Enter>",func=lambda e: f1_left_sec_menu_5.config(fg=theme_color[2]))
+
+        f1_left_sec_menu_0.bind("<Leave>",func=lambda e: f1_left_sec_menu_0.config(fg=theme_color[-1]))
+        f1_left_sec_menu_1.bind("<Leave>",func=lambda e: f1_left_sec_menu_1.config(fg=theme_color[-1]))
+        f1_left_sec_menu_2.bind("<Leave>",func=lambda e: f1_left_sec_menu_2.config(fg=theme_color[-1]))
+        f1_left_sec_menu_3.bind("<Leave>",func=lambda e: f1_left_sec_menu_3.config(fg=theme_color[-1]))
+        f1_left_sec_menu_4.bind("<Leave>",func=lambda e: f1_left_sec_menu_4.config(fg=theme_color[-1]))
+        f1_left_sec_menu_5.bind("<Leave>",func=lambda e: f1_left_sec_menu_5.config(fg=theme_color[-1]))
+        
+        # Root Editor F2
+        f2_back_button.config(fg=theme_color[-1])
+        f2_open_button.config(fg=theme_color[-1])
+        f2_save_button.config(fg=theme_color[-1])
+        f2_head_label.config(fg=theme_color[-1])
+        f2_test_area.config(fg=theme_color[0])
+
+        #Root Open Close Frame F3
+        f3_back_button.config(fg=theme_color[-1])
+        f3_head_label.config(fg=theme_color[-1])
     
     #Root Frame 1
-    root_home_frame=tk.Frame(root,background=theme_color[0])
+    root_home_frame=tk.Frame(root)
     root_home_frame.grid(row=0,column=0,sticky=tk.N+tk.E+tk.W+tk.S,)
     # root_home_frame.bind("<Configure>",resize)
 
     # Root Frame 1 Left Navigation
-    f1_left_sec=tk.Frame(root_home_frame,background=theme_color[0])
+    f1_left_sec=tk.Frame(root_home_frame)
     f1_left_sec.pack(side=tk.LEFT,fill=tk.BOTH)
 
     # Root Frame 1 left Nav Brand
-    f1_left_sec_brand=tk.Frame(f1_left_sec,background='saddle brown')
+    f1_left_sec_brand=tk.Frame(f1_left_sec)
     f1_left_sec_brand.pack(side=tk.TOP,fill=tk.BOTH)
 
-    f1_left_sec_brand_name=tk.Label(f1_left_sec_brand,text="Encryptor/Decryptor",background='saddle brown',fg="white",font=(fonts[0],12))
+    f1_left_sec_brand_name=tk.Label(f1_left_sec_brand,text="Encryptor/Decryptor",font=(fonts[0],12))
     f1_left_sec_brand_name.pack(side=tk.RIGHT,expand=True,fill=tk.BOTH,pady=10)
 
     # Root Frame 1 Left Nav Menu
-    f1_left_sec_menu=tk.Frame(f1_left_sec,background=color[7],height=10)
+    f1_left_sec_menu=tk.Frame(f1_left_sec,height=10)
     f1_left_sec_menu.pack(side=tk.BOTTOM,expand=True,fill=tk.BOTH)
 
     # Root Frame 1 Left Nav Menu List
     f1_left_sec_menu_1=tk.Button(f1_left_sec_menu,text="Encryptor a File",command=encrypt_open_file)
     f1_left_sec_menu_2=tk.Button(f1_left_sec_menu,text="Decryptor a File",command=decrypt_open_file)
     f1_left_sec_menu_3=tk.Button(f1_left_sec_menu,text="Open Encrypted File",command=open_encrypt_file)
-    f1_left_sec_menu_4=tk.Button(f1_left_sec_menu,text="Generate a Key",command=button_generate)
+    f1_left_sec_menu_4=tk.Button(f1_left_sec_menu,text="Generate a Key",command=button_generate_key)
     f1_left_sec_menu_5=tk.Button(f1_left_sec_menu,text="Open Editor",command=open_editor)
     f1_left_sec_menu_0=tk.Button(f1_left_sec_menu,text="Exit",command=exit_button)
-    f1_left_sec_menu_0.pack(side=tk.BOTTOM,fill=tk.X,padx=10,pady=15)
+    f1_left_sec_menu_0.pack(side=tk.BOTTOM,fill=tk.X,padx=5,pady=15)
 
     for i in [f1_left_sec_menu_1,f1_left_sec_menu_2,f1_left_sec_menu_3,f1_left_sec_menu_4,f1_left_sec_menu_5]:
-        i.pack(fill=tk.X,padx=10,pady=15)
+        i.pack(fill=tk.X,padx=5,pady=15)
 
     for i in [f1_left_sec_menu_1,f1_left_sec_menu_2,f1_left_sec_menu_3,f1_left_sec_menu_4,f1_left_sec_menu_0,f1_left_sec_menu_5]:
-        i.config(background=color[7],bd=0,activebackground=color[7],font=(fonts[0],12),fg="black",bg=color[7])
-    
-    f1_left_sec_menu_0.bind("<Enter>",func=lambda e: f1_left_sec_menu_0.config(fg="blue"))
-    f1_left_sec_menu_1.bind("<Enter>",func=lambda e: f1_left_sec_menu_1.config(fg="blue"))
-    f1_left_sec_menu_2.bind("<Enter>",func=lambda e: f1_left_sec_menu_2.config(fg="blue"))
-    f1_left_sec_menu_3.bind("<Enter>",func=lambda e: f1_left_sec_menu_3.config(fg="blue"))
-    f1_left_sec_menu_4.bind("<Enter>",func=lambda e: f1_left_sec_menu_4.config(fg="blue"))
-    f1_left_sec_menu_5.bind("<Enter>",func=lambda e: f1_left_sec_menu_5.config(fg="blue"))
-
-    f1_left_sec_menu_0.bind("<Leave>",func=lambda e: f1_left_sec_menu_0.config(fg="black"))
-    f1_left_sec_menu_1.bind("<Leave>",func=lambda e: f1_left_sec_menu_1.config(fg="black"))
-    f1_left_sec_menu_2.bind("<Leave>",func=lambda e: f1_left_sec_menu_2.config(fg="black"))
-    f1_left_sec_menu_3.bind("<Leave>",func=lambda e: f1_left_sec_menu_3.config(fg="black"))
-    f1_left_sec_menu_4.bind("<Leave>",func=lambda e: f1_left_sec_menu_4.config(fg="black"))
-    f1_left_sec_menu_5.bind("<Leave>",func=lambda e: f1_left_sec_menu_5.config(fg="black"))
+        i.config(bd=0,font=(fonts[0],12))
 
     # Root Frame 1 Right Section
     f1_right_sec=tk.Frame(root_home_frame)
@@ -194,8 +315,14 @@ if __name__=="__main__":
     f1_right_sec_head=tk.Label(f1_right_sec,text="Recent Files")
     f1_right_sec_head.pack(fill=tk.X,expand=True,side=tk.TOP)
 
+    login_btn = tk.PhotoImage(file = "./icon/icon (1).png")
+    login_btn2 = tk.PhotoImage(file = "./icon/icon (2).png")
+    f1_button=tk.Button(f1_right_sec,image=login_btn,borderwidth=0,command=lambda : f1_button.config(image=login_btn2))
+    f1_button.pack()
+    # f1_button.bind("<>",func=lambda : f1_button.config(image=login_btn2))
+
     #Root Frame 2
-    root_editor_frame=tk.Frame(root,background=color[99])
+    root_editor_frame=tk.Frame(root)
     root_editor_frame.grid(row=0,column=0,sticky=tk.N+tk.E+tk.W+tk.S,)
 
     # Root Frame 2 Head Bar
@@ -203,58 +330,99 @@ if __name__=="__main__":
     f2_head.pack(side=tk.TOP,fill=tk.X)
 
     f2_back_button=tk.Button(f2_head,text="Back",command=f2_back_button_pressed)
-    f2_back_button.config(background=color[7],bd=0,activebackground=color[7],font=(fonts[0],10),fg="black",bg=color[7])
+    f2_back_button.config(bd=0,font=(fonts[0],10))
     f2_back_button.pack(side=tk.LEFT,fill=tk.BOTH,ipadx=3,ipady=3)
-    
-    f2_back_button.bind("<Enter>",func=lambda e: f2_back_button.config(bg="blue"))
-    f2_back_button.bind("<Leave>",func=lambda e: f2_back_button.config(bg=color[7]))
+
+    f2_open_button=tk.Button(f2_head,text="Open",command=f2_open_button_pressed)
+    f2_open_button.config(bd=0,font=(fonts[0],10))
+    f2_open_button.pack(side=tk.RIGHT,fill=tk.BOTH,ipadx=3,ipady=3)
+    # f2_open_button.config(state=tk.DISABLED)
+
+    f2_save_button=tk.Button(f2_head,text="Save",command=f2_save_button_pressed)
+    f2_save_button.config(bd=0,font=(fonts[0],10))
+    f2_save_button.pack(side=tk.RIGHT,fill=tk.BOTH,ipadx=3,ipady=3)
+    f2_save_button.config(state=tk.DISABLED)
 
     f2_head_label=tk.Label(f2_head,text="Text Editor : No File Selected")
-    f2_head_label.config(background=color[7],font=(fonts[0],10),fg="black")
+    f2_head_label.config(font=(fonts[0],10))
     f2_head_label.pack(side=tk.RIGHT,expand=True,fill=tk.BOTH)
     
     # Root Frame 2 Rest Page
-    box_frame=tk.Frame(root_editor_frame)
-    box_frame.pack(fill=tk.BOTH,expand=True,padx=10,pady=10)
+    f2_text_box_frame=tk.Frame(root_editor_frame)
+    f2_text_box_frame.pack(fill=tk.BOTH,expand=True,)#padx=5,pady=5)
 
-    f2_test_area = tk.Text(box_frame,height=1,width=1,font=("Corbel", 12),undo=True)
+    f2_test_area = tk.Text(f2_text_box_frame,bd=0,height=1,width=1,font=("Corbel", 12),undo=True)
     f2_test_area.pack(side=tk.LEFT,expand=True,fill=tk.BOTH)
-    f2_text_area_scrollbar=tk.Scrollbar(box_frame,command=f2_test_area.yview)
+    f2_text_area_scrollbar=tk.Scrollbar(f2_text_box_frame,command=f2_test_area.yview)
     f2_test_area.config(yscrollcommand=f2_text_area_scrollbar.set)
     f2_text_area_scrollbar.pack(side=tk.RIGHT,fill=tk.BOTH)
 
-    b_frame=tk.Frame(root_editor_frame)
-    b_frame.pack(side=tk.RIGHT,fill=tk.BOTH,pady=10,padx=10,expand=True)
-
-    b1 = tk.Button(b_frame, text = "Save",command=save )
-    b1.grid(row=0,column=0)    
-    b2 = tk.Button(b_frame, text = "Clear",command = clear) 
-    b2.grid(row=0,column=1)
-
-    root_editor_frame.bind("<KeyRelease>",keyrelease)
-    root_editor_frame.bind("<KeyPress>",keypress)
-
     #Root Frame 3
-    root_open_close_file_frame=tk.Frame(root,background=color[100])
+    root_open_close_file_frame=tk.Frame(root)
     root_open_close_file_frame.grid(row=0,column=0,sticky=tk.N+tk.E+tk.W+tk.S,)
     
-    # Root Frame 2 Head Bar
+    # Root Frame 3 Head Bar
     f3_head=tk.Frame(root_open_close_file_frame)
     f3_head.pack(side=tk.TOP,fill=tk.X)
 
-    f3_back_button=tk.Button(f3_head,text="Back",command=lambda: root_open_close_file_frame.tkraise())
-    f3_back_button.config(background=color[7],bd=0,activebackground=color[7],font=(fonts[0],10),fg="black",bg=color[7])
+    f3_back_button=tk.Button(f3_head,text="Back",command=f3_back_button_pressed)
+    f3_back_button.config(bd=0,font=(fonts[0],10))
     f3_back_button.pack(side=tk.LEFT,fill=tk.BOTH,ipadx=3,ipady=3)
-    
-    f3_back_button.bind("<Enter>",func=lambda e: f3_back_button.config(bg="blue"))
-    f3_back_button.bind("<Leave>",func=lambda e: f3_back_button.config(bg=color[7]))
 
-    f3_head_label=tk.Label(f3_head,text="Hello World")
-    f3_head_label.config(background=color[7],font=(fonts[0],10),fg="black")
+    f3_head_label=tk.Label(f3_head,text="Encreption of Files")
+    f3_head_label.config(font=(fonts[0],10))
     f3_head_label.pack(side=tk.RIGHT,expand=True,fill=tk.BOTH)
+
+    # Root Frame 3 Rest Page  
+    f3_add_frame=tk.Frame(root_open_close_file_frame)
+    f3_add_frame.pack(fill=tk.BOTH,side=tk.TOP,expand=True,padx=20,pady=20)
+
+    f3_name_listbox_label=tk.Label(f3_add_frame,text="Name"+"size".rjust(20," "),anchor=tk.W)
+    f3_name_listbox_label.pack(side=tk.TOP,fill=tk.X)
+
+    f3_name_listbox_frame=tk.Frame(f3_add_frame)
+    f3_name_listbox_frame.pack(expand=True,fill=tk.BOTH)
+
+    f3_name_listbox=tk.Listbox(f3_name_listbox_frame,selectmode=tk.MULTIPLE,relief=tk.FLAT,highlightthickness=0,bd=5,activestyle=tk.NONE)
+    f3_name_listbox.pack(expand=True,side=tk.LEFT,fill=tk.BOTH)
     
-    # Root Frame 2 Rest Page    
-    root_open_close_file_frame.tkraise()
+    f3_scroll=tk.Scrollbar(f3_name_listbox_frame,command=f3_name_listbox.yview)
+    f3_name_listbox.config(yscrollcommand=f3_scroll.set)
+    f3_scroll.pack(side=tk.RIGHT,fill=tk.Y)
+
+    for i in range(100):
+        # f3_check=Checkbutton(f3_name_listbox,text="Hello"+(str(i)+"kb").rjust(20," "))
+        # f3_check.pack(fill=tk.X,expand=True)
+        f3_name_listbox.insert(tk.END,"Hello"+str(i),)
+
+    # Root F3 Destination buttons
+    f3_execution_frame=tk.Frame(root_open_close_file_frame)
+    f3_execution_frame.pack(fill=tk.X,side=tk.BOTTOM,padx=20,pady=20)
+
+    f3_file_location_label=tk.Label(f3_execution_frame,text="Destination Location :",anchor=tk.W)
+    f3_file_location_label.pack(side=tk.LEFT,fill=tk.BOTH)
+    f3_file_location_label=tk.Entry(f3_execution_frame,selectborderwidth=0)
+    f3_file_location_label.pack(side=tk.LEFT,fill=tk.BOTH,expand=True,pady=5,padx=5)
+    f3_file_location_label.insert(0,"Enter the Location of file to be saved")
+    f3_execute_button=tk.Button(f3_execution_frame,text="Encrypt")
+    f3_execute_button.pack(side=tk.RIGHT,ipadx=5)
+    f3_add_button=tk.Button(f3_execution_frame,text="Select Folder")
+    f3_add_button.pack(side=tk.RIGHT,ipadx=5)
+
+    
+    # Root F3 Add buttons
+    f3_add_bottom_frame=tk.Frame(root_open_close_file_frame)
+    f3_add_bottom_frame.pack(fill=tk.X,side=tk.BOTTOM,padx=20)
+
+    f3_remove_button=tk.Button(f3_add_bottom_frame,text="Remove Selected")
+    f3_remove_button.pack(side=tk.RIGHT,ipadx=10)
+    f3_add_button=tk.Button(f3_add_bottom_frame,text="Add Files")
+    f3_add_button.pack(side=tk.RIGHT,ipadx=10)
+
+
+    # Which Page to Be Seen First  
+    # root_open_close_file_frame.tkraise()
     # root_editor_frame.tkraise()
-    # root_home_frame.tkraise()
-    tk.mainloop()
+    root_home_frame.tkraise()
+    color_theme(theme_color2)
+    root.mainloop()
