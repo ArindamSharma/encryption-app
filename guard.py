@@ -42,23 +42,24 @@ if __name__=="__main__":
     # Pre Define Varibales
     file_extension=".secret"
     file_opened=None
-    theme_color1=["black","grey"]
-    theme_color2=[
-        "#2f3e46",
-        "#354f52",
-        "#52796f",
-        "#84a98c",
-        "#cad2c5",
-    ] # https://coolors.co/cad2c5-84a98c-52796f-354f52-2f3e46
-    theme_color3=[
-        "#0a0908",
-        "#22333b",
-        "#5e503f",
-        "#c6ac8f",
-        "#eae0d5",
-    ] # https://coolors.co/0a0908-22333b-eae0d5-c6ac8f-5e503f
+    themes_10=[
+        # https://coolors.co/ 
+        # Order Dark to Light
+        ["#ffe169","#fad643","#edc531","#dbb42c","#c9a227","#b69121","#a47e1b","#926c15","#805b10","#76520e"],  #yelloish
+        ["#0466c8","#0353a4","#023e7d","#002855","#001845","#001233","#33415c","#5c677d","#7d8597","#979dac"],  #bluish
+        ["#036666","#14746f","#248277","#358f80","#469d89","#56ab91","#67b99a","#78c6a3","#88d4ab","#99e2b4"],  #grennish
+        ["#582F0E","#333D29","#414833","#7F4F24","#656D4A","#936639","#A68A64","#A4AC86","#B6AD90","#C2C5AA"],  #browngreen
+        ["#edc4b3","#e6b8a2","#deab90","#d69f7e","#cd9777","#c38e70","#b07d62","#9d6b53","#8a5a44","#774936"],  # skincolor
+        ["#012a4a","#013a63","#01497c","#014f86","#2a6f97","#2c7da0","#468faf","#61a5c2","#89c2d9","#a9d6e5"],  #bluish
+        ["#03071e","#370617","#6a040f","#9d0208","#d00000","#dc2f02","#e85d04","#f48c06","#faa307","#ffba08"],  #redyellow
+        ["#001219","#9B2226","#AE2012","#005F73","#BB3E03","#CA6702","#0A9396","#EE9B00","#94D2BD","#E9D8A6"],  #blueyellowred
+        ["#d9ed92","#b5e48c","#99d98c","#76c893","#52b69a","#34a0a4","#168aad","#1a759f","#1e6091","#184e77"],  #yellowishgreenblue
+        ["#583101","#603808","#6f4518","#8b5e34","#a47148","#bc8a5f","#d4a276","#e7bc91","#f3d5b5","#ffedd8"],  #brownish
 
-    theme_font=["theme_color[0]"]
+    ]
+    theme_font=[
+        (fonts[0],14),
+    ]
     # f1_left_sec_hsize=(250,300)#(min,max)
 
     # Root Window
@@ -175,8 +176,8 @@ if __name__=="__main__":
         f3_name_listbox.delete(0,f3_name_listbox.size())
         f3_remove_button.config(state=tk.DISABLED)
         f3_error_message_label.config(text="")
-        f3_file_location_label.delete(0,tk.END)
-        f3_file_location_label.insert(0,"Enter the Location of file to be saved")
+        f3_file_location_entry.delete(0,tk.END)
+        f3_file_location_entry.insert(0,"Enter the Location of file to be saved")
         f1_root_home_frame.tkraise()
 
     def f3_add_button_pressed(filetype):
@@ -201,7 +202,6 @@ if __name__=="__main__":
             f3_error_message_label.config(text="Please Select Something")
         else:
             f3_error_message_label.config(text="")
-        # f3_root_open_close_file_frame.tkraise()
 
     def f3_execute_button_pressed():
         print(f3_name_listbox.get(0,f3_name_listbox.size()))
@@ -211,24 +211,28 @@ if __name__=="__main__":
 
     def f3_select_destination_button_pressed():
         filedir=filedialog.askdirectory()
-        # print(filedir)
-        f3_file_location_label.delete(0,tk.END)
-        f3_file_location_label.insert(0,filedir)
+        if(filedir):
+            # print(filedir)
+            f3_file_location_entry.delete(0,tk.END)
+            f3_file_location_entry.insert(0,filedir)
 
 
     def color_theme(theme_color):   
         # button Styles
         def button_type1(widget):
-            widget.config(background=theme_color[0],activebackground=theme_color[0])
-            widget.bind("<Enter>",func=lambda e: widget.config(bg=theme_color[-2],fg=theme_color[0]))
+            widget.config(background=theme_color[0],activebackground=theme_color[0],fg=theme_color[-1])
+            widget.bind("<Enter>",func=lambda e: widget.config(bg=theme_color[-5],fg=theme_color[1]))
             widget.bind("<Leave>",func=lambda e: widget.config(bg=theme_color[0],fg=theme_color[-1]))
-            widget.config(fg=theme_color[-1])
 
-        def button_type2_home_menu(widget):
-            widget.config(background=theme_color[1],activebackground=theme_color[1])
-            widget.bind("<Enter>",func=lambda e: widget.config(fg=theme_color[2]))
+        def button_type2(widget):
+            widget.config(background=theme_color[-4],activebackground=theme_color[-4],fg=theme_color[1])
+            widget.bind("<Enter>",func=lambda e: widget.config(bg=theme_color[4],fg=theme_color[-1]))
+            widget.bind("<Leave>",func=lambda e: widget.config(bg=theme_color[-4],fg=theme_color[1]))
+
+        def button_type1_home_menu(widget):
+            widget.config(background=theme_color[1],activebackground=theme_color[1],fg=theme_color[-1])
+            widget.bind("<Enter>",func=lambda e: widget.config(fg=theme_color[4]))
             widget.bind("<Leave>",func=lambda e: widget.config(fg=theme_color[-1]))
-            widget.config(fg=theme_color[-1])
         
         # Root
         root.configure(background=theme_color[0])
@@ -238,39 +242,43 @@ if __name__=="__main__":
         f1_left_sec_brand.config(background=theme_color[0])
         f1_left_sec_brand_name.config(background=theme_color[0])
         f1_right_sec.config(background=theme_color[-1])
-        f2_root_editor_frame.config(background=theme_color[0])
         
         f1_left_sec_menu.config(background=theme_color[1])
         f1_left_sec_brand_name.config(fg=theme_color[-1])
 
-        button_type2_home_menu(f1_left_sec_menu_button_0)
-        button_type2_home_menu(f1_left_sec_menu_button_1)
-        button_type2_home_menu(f1_left_sec_menu_button_2)
-        button_type2_home_menu(f1_left_sec_menu_button_3)
-        button_type2_home_menu(f1_left_sec_menu_button_4)
-        button_type2_home_menu(f1_left_sec_menu_button_5)
+        button_type1_home_menu(f1_left_sec_menu_button_0)
+        button_type1_home_menu(f1_left_sec_menu_button_1)
+        button_type1_home_menu(f1_left_sec_menu_button_2)
+        button_type1_home_menu(f1_left_sec_menu_button_3)
+        button_type1_home_menu(f1_left_sec_menu_button_4)
+        button_type1_home_menu(f1_left_sec_menu_button_5)
         
         # Root Editor F2
+        f2_root_editor_frame.config(background=theme_color[0])
         button_type1(f2_back_button)
         button_type1(f2_open_button)
         button_type1(f2_save_button)
-        f2_head_label.config(background=theme_color[0])
-        f2_head_label.config(fg=theme_color[-1])
-        f2_test_area.config(background=theme_color[-1],selectbackground=theme_color[-2])
-        f2_test_area.config(fg=theme_color[0])
+        f2_head_label.config(background=theme_color[0],fg=theme_color[-1])
+        f2_test_area.config(background=theme_color[-1],selectbackground=theme_color[-2],fg=theme_color[0])
         f2_text_box_frame.config(bg="Black")
 
         #Root Open Close Frame F3
-        f3_root_open_close_file_frame.config(background=theme_color[-1])
+        f3_root_open_close_file_frame.config(background=theme_color[-2])
         button_type1(f3_back_button)
         f3_head_label.config(background=theme_color[0])
+        f3_name_listbox_label.config(background=theme_color[-3],fg=theme_color[0])
+        f3_name_listbox.config(background=theme_color[-1],fg=theme_color[0],selectbackground=theme_color[-4],selectforeground=theme_color[1])
+        
+        f3_execution_frame.config(bg=theme_color[-3])
+        f3_file_location_label.config(bg=theme_color[-3],fg=theme_color[0])
+        f3_file_location_entry.config(bg=theme_color[-1],fg=theme_color[0])
         f3_head_label.config(fg=theme_color[-1])
         f3_add_botton_frame.config(background=theme_color[-1])
         f3_error_message_label.config(background=theme_color[-1])
         button_type1(f3_execute_button)
-        button_type1(f3_destination_button)
-        button_type1(f3_add_button)
-        button_type1(f3_remove_button)
+        button_type2(f3_destination_button)
+        button_type2(f3_add_button)
+        button_type2(f3_remove_button)
 
     #Root Frame 1
     f1_root_home_frame=tk.Frame(root)
@@ -293,18 +301,19 @@ if __name__=="__main__":
     f1_left_sec_menu.pack(side=tk.BOTTOM,expand=True,fill=tk.BOTH)
 
     # Root Frame 1 Left Nav Menu List
+    f1_left_sec_menu_button_0=tk.Button(f1_left_sec_menu,text="Exit",command=f1_exit_button)
+    f1_left_sec_menu_button_0.pack(side=tk.BOTTOM,fill=tk.X,padx=5,pady=15)
+    
     f1_left_sec_menu_button_1=tk.Button(f1_left_sec_menu,text="Encrypt Files",command=f1_encrypt_open_file)
     f1_left_sec_menu_button_2=tk.Button(f1_left_sec_menu,text="Decrypt Files",command=f1_decrypt_open_file)
     f1_left_sec_menu_button_3=tk.Button(f1_left_sec_menu,text="Open Encrypted File",command=f1_open_encrypt_file)
     f1_left_sec_menu_button_4=tk.Button(f1_left_sec_menu,text="Generate a Key",command=f1_button_generate_key)
     f1_left_sec_menu_button_5=tk.Button(f1_left_sec_menu,text="Open Editor",command=f1_open_editor)
-    f1_left_sec_menu_button_0=tk.Button(f1_left_sec_menu,text="Exit",command=f1_exit_button)
-    f1_left_sec_menu_button_0.pack(side=tk.BOTTOM,fill=tk.X,padx=5,pady=15)
 
     for i in [f1_left_sec_menu_button_1,f1_left_sec_menu_button_2,f1_left_sec_menu_button_3,f1_left_sec_menu_button_4,f1_left_sec_menu_button_5]:
-        i.pack(fill=tk.X,padx=5,pady=15)
+        i.pack(fill=tk.X,padx=10,pady=20)
 
-    for i in [f1_left_sec_menu_button_1,f1_left_sec_menu_button_2,f1_left_sec_menu_button_3,f1_left_sec_menu_button_4,f1_left_sec_menu_button_0,f1_left_sec_menu_button_5]:
+    for i in [f1_left_sec_menu_button_1,f1_left_sec_menu_button_2,f1_left_sec_menu_button_3,f1_left_sec_menu_button_4,f1_left_sec_menu_button_5,f1_left_sec_menu_button_0]:
         i.config(bd=0,font=(fonts[0],12))
 
     # Root Frame 1 Right Section
@@ -322,7 +331,7 @@ if __name__=="__main__":
 
     #Root Frame 2
     f2_root_editor_frame=tk.Frame(root)
-    f2_root_editor_frame.grid(row=0,column=0,sticky=tk.N+tk.E+tk.W+tk.S,)
+    f2_root_editor_frame.grid(row=0,column=0,sticky=tk.N+tk.E+tk.W+tk.S)
 
     # Root Frame 2 Head Bar
     f2_head=tk.Frame(f2_root_editor_frame)
@@ -348,7 +357,7 @@ if __name__=="__main__":
     
     # Root Frame 2 Rest Page
     f2_text_box_frame=tk.Frame(f2_root_editor_frame)
-    f2_text_box_frame.pack(fill=tk.BOTH,expand=True,)#padx=5,pady=5)
+    f2_text_box_frame.pack(fill=tk.BOTH,expand=True,padx=5,pady=5)
 
     f2_test_area = tk.Text(f2_text_box_frame,bd=0,height=1,width=1,font=("Corbel", 12),undo=True)
     f2_test_area.pack(side=tk.LEFT,expand=True,fill=tk.BOTH)
@@ -369,7 +378,7 @@ if __name__=="__main__":
     f3_back_button.pack(side=tk.LEFT,fill=tk.BOTH,ipadx=3,ipady=3)
 
     f3_head_label=tk.Label(f3_head,text="Encryption of Files")
-    f3_head_label.config(font=(fonts[0],10))
+    f3_head_label.config(font=(fonts[0],10),)
     f3_head_label.pack(side=tk.RIGHT,expand=True,fill=tk.BOTH)
 
     # Root Frame 3 Rest Page  
@@ -377,15 +386,20 @@ if __name__=="__main__":
     f3_add_frame.pack(fill=tk.BOTH,side=tk.TOP,expand=True,padx=20,pady=20)
 
     f3_name_listbox_label=tk.Label(f3_add_frame,text="Names",anchor=tk.W)
-    f3_name_listbox_label.pack(side=tk.TOP,fill=tk.X)
+    f3_name_listbox_label.config(font=theme_font[0])
+    f3_name_listbox_label.pack(side=tk.TOP,fill=tk.X,ipady=2)
 
     f3_name_listbox_frame=tk.Frame(f3_add_frame)
     f3_name_listbox_frame.pack(expand=True,fill=tk.BOTH)
 
     f3_name_listbox=tk.Listbox(f3_name_listbox_frame,selectmode=tk.MULTIPLE,relief=tk.FLAT,highlightthickness=0,bd=5,activestyle=tk.NONE)
+    f3_name_listbox.config(font=theme_font[0])
     f3_name_listbox.pack(expand=True,side=tk.LEFT,fill=tk.BOTH)
+
+    for i in range(50):
+        f3_name_listbox.insert(i,"hello "+str(i))
     
-    f3_scroll=tk.Scrollbar(f3_name_listbox_frame,command=f3_name_listbox.yview)
+    f3_scroll=tk.Scrollbar(f3_name_listbox_frame,command=f3_name_listbox.yview,orient=tk.VERTICAL)
     f3_name_listbox.config(yscrollcommand=f3_scroll.set)
     f3_scroll.pack(side=tk.RIGHT,fill=tk.Y)
 
@@ -393,12 +407,12 @@ if __name__=="__main__":
     f3_execution_frame=tk.Frame(f3_root_open_close_file_frame)
     f3_execution_frame.pack(fill=tk.X,side=tk.BOTTOM,padx=20,pady=20)
 
-    f3_file_location_label=tk.Label(f3_execution_frame,text="Destination Location :",anchor=tk.W)
+    f3_file_location_label=tk.Label(f3_execution_frame,text="Destination Location :",anchor=tk.W,font=theme_font[0])
     f3_file_location_label.pack(side=tk.LEFT,fill=tk.BOTH)
 
-    f3_file_location_label=tk.Entry(f3_execution_frame,selectborderwidth=0)
-    f3_file_location_label.pack(side=tk.LEFT,fill=tk.BOTH,expand=True,pady=5,padx=5)
-    f3_file_location_label.insert(0,"Enter the Location of file to be saved")
+    f3_file_location_entry=tk.Entry(f3_execution_frame,selectborderwidth=0,bd=5,relief=tk.FLAT,font=theme_font[0])
+    f3_file_location_entry.pack(side=tk.LEFT,fill=tk.BOTH,expand=True,pady=2,padx=2)
+    f3_file_location_entry.insert(0,"Enter the Location of file to be saved")
 
     f3_execute_button=tk.Button(f3_execution_frame,text="Encrypt",command=f3_execute_button_pressed)
     f3_execute_button.config(bd=0,font=(fonts[0],10))
@@ -429,5 +443,5 @@ if __name__=="__main__":
     # f3_root_open_close_file_frame.tkraise()
     # f2_root_editor_frame.tkraise()
     f1_root_home_frame.tkraise()
-    color_theme(theme_color2)
+    color_theme(themes_10[9])#0,1,2,3,4,5,6,7,8,9
     root.mainloop()
