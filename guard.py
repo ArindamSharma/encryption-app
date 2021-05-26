@@ -1,4 +1,8 @@
 # Encryption Decryption Functions
+from tkinter import YView
+from tkinter.constants import LEFT, RIGHT
+
+
 def generate_key():
     key = Fernet.generate_key()
     with open("secret.key", "wb") as key_file:
@@ -32,6 +36,7 @@ if __name__=="__main__":
         os.system("pip install cryptography")
         print("Complete Installation")
         print("Re-run the code")
+        exit()
     # generate_key()
 
     # Pre Define Varibales
@@ -57,11 +62,15 @@ if __name__=="__main__":
         (fonts[0],14),
     ]
     # Current Configuration Variables
+    config_new_recent_max=5
+    config_old_recent_max=5
+    config_feature=3
+    config_theme_color=9
     config_file_name=__file__.split("\\")[-1].strip(".py")+".config"
     file_not_found=False
-    config_recent_opened=[]
-    config_theme_color=9
-    
+    config_new_recent=[]
+    config_old_recent=[]
+
     # Root Window
     root = tk.Tk()
     root.title("Encryption/Decryption")
@@ -73,33 +82,60 @@ if __name__=="__main__":
     # Reading Config File 
     try:
         config_file=open(config_file_name,"rb+")
-        config_file_data=[i.decode() for i in config_file.readlines()[:2]]
-        config_recent_opened=config_file_data[0].strip("\n").split(":")[1].strip(",").split(",")
-        config_theme_color=int(config_file_data[1].split(":")[1])
-        # print(config_theme_color)
+        config_file_data=[i.decode().strip("\n") for i in config_file.readlines()]
+        if(len(config_file_data)!=3 or config_file_data[0][:11]!="new_recent:" or config_file_data[1][:11]!="old_recent:" or config_file_data[2][:12]!="color_theme:"):
+            raise FileNotFoundError
+        # print(config_file_data)
+        try:
+            if(config_file_data[0][11:-1].strip(",")!=''):
+                config_new_recent=[i.strip(" ") for i in config_file_data[0][11:].strip(",").split(",")]
+            # print(config_new_recent)
+            config_theme_color=int(config_file_data[2][12:])
+            if(config_file_data[1][11:-1].strip(",")!=''):
+                for i in config_file_data[1][11:].strip(",").split(","):
+                    tmp=i.strip(" ").split("|")
+                    if(i.strip(" ")=='' or len(tmp)==1):
+                        raise FileNotFoundError
+                    config_old_recent.append([tmp[0],int(tmp[1])])
+            # print(config_old_recent)
+        except:
+            raise FileNotFoundError
         config_file.close()
     except(FileNotFoundError):
         file_not_found=True
     
     #Functions
     def window_exit():
-        # print(config_recent_opened)
-        if(file_not_found):
-            print("Creating Configure File")       
-            config_file=open(config_file_name,"wb")
-            config_file.write("recent_opened:".encode())
-            for i in config_recent_opened:
-                config_file.write((i+",").encode())
-                # print(i,end=",")
-            config_file.write(("\ncolor_theme:"+str(config_theme_color)).encode())
-            # print(config_theme_color)
-            # for i in range(10):
-            #     config_file.write("arindam".encode())
-            # print(config_theme_color,config_recent_opened)
-
+        # print("Configure File")       
+        config_file=open(config_file_name,"wb")
+        config_file.write("new_recent:".encode())
+        for i in config_new_recent:
+            config_file.write((i+",").encode())
+        config_file.write(("\n").encode())
+        config_file.write("old_recent:".encode())
+        for i in config_old_recent:
+            config_file.write((i[0]+"|"+str(i[1])+",").encode())
+        config_file.write(("\n").encode())
+        config_file.write(("color_theme:"+str(config_theme_color)).encode())
+        config_file.close()
         print("Have a Nice Day")
         root.destroy()
         
+    def add_new_file_to_recent(filename):
+        if(filename in config_new_recent):
+            config_new_recent.remove(filename)
+            config_old_recent.insert(0,(filename,2))
+            if(len(config_old_recent)>config_old_recent_max):
+                config_old_recent.pop()
+        elif(filename in [i[0] for i in config_old_recent]):
+            for i in config_old_recent:
+                if(i[0]==filename):
+                    i[1]+=1
+        else:
+            config_new_recent.insert(0,filename)
+            if(len(config_new_recent)>config_new_recent_max):
+                config_new_recent.pop()
+
     # Root Home F1 BUttons 
     def f1_exit_button():
         window_exit()
@@ -136,23 +172,13 @@ if __name__=="__main__":
             # f2_test_area.insert(tk.END, decrypt_message(data.read()))
             f2_test_area.insert(tk.END, data.read())
             data.close()
+            add_new_file_to_recent(filename)
 
     def f1_open_editor():
-        # f2_open_button.config(state=tk.NORMAL)
         f2_root_editor_frame.tkraise()
 
     def f1_button_generate_key():
         pass
-    
-    def save(data):
-        # print(f2_test_area.get(1.0,tk.END))
-        data.seek(0)
-        data.truncate(0)
-        data.write(f2_test_area.get(1.0,tk.END).encode())
-        # data.write(encrypt_message(f2_test_area.get(1.0,tk.END)).encode())
-        f2_test_area.insert(tk.END, data.read())
-        print("File Saved")
-
     #Root F2 buttons 
     def f2_back_button_pressed():
         global file_opened
@@ -193,12 +219,12 @@ if __name__=="__main__":
             file_opened=filename
             # f2_root_editor_frame.tkraise()
             f2_head_label.config(text="Text Editor : Selected File :- "+filename.split("/")[-1])
-            f2_save_button.config(state=tk.NORMAL)
-            
+            f2_save_button.config(state=tk.NORMAL)       
             data=open(filename,"rb+")
             # f2_test_area.insert(tk.END, decrypt_message(data.read()))
             f2_test_area.insert(tk.END, data.read())
             data.close()
+            add_new_file_to_recent(filename)
 
     # Root F3 Buttons
     def f3_back_button_pressed():
@@ -222,6 +248,7 @@ if __name__=="__main__":
         if(filename):    
             f3_name_listbox.insert(tk.END,filename)
             f3_remove_button.config(state=tk.NORMAL)
+            add_new_file_to_recent(filename)
 
     def f3_remove_button_pressed():
         local=f3_name_listbox.curselection()
@@ -249,6 +276,7 @@ if __name__=="__main__":
     def f4_back_button_pressed():
         f1_root_home_frame.tkraise()
 
+
     def color_theme(theme_color):   
         # button Styles
         def button_type1(widget):
@@ -269,15 +297,13 @@ if __name__=="__main__":
         # Root
         root.configure(background=theme_color[0])
 
-        # Root Home F1 
+        # Root Home Frame F1 
         f1_root_home_frame.config(background=theme_color[0])
         f1_left_sec_brand.config(background=theme_color[0])
-        f1_left_sec_brand_name.config(background=theme_color[0])
+        f1_left_sec_brand_name.config(background=theme_color[0],fg=theme_color[-1])
         f1_right_sec.config(background=theme_color[-1])
-        
         f1_left_sec_menu.config(background=theme_color[1])
-        f1_left_sec_brand_name.config(fg=theme_color[-1])
-
+        
         button_type1_home_menu(f1_left_sec_menu_button_0)
         button_type1_home_menu(f1_left_sec_menu_button_1)
         button_type1_home_menu(f1_left_sec_menu_button_2)
@@ -285,7 +311,7 @@ if __name__=="__main__":
         button_type1_home_menu(f1_left_sec_menu_button_4)
         button_type1_home_menu(f1_left_sec_menu_button_5)
         
-        # Root Editor F2
+        # Root Editor Frame F2
         f2_root_editor_frame.config(background=theme_color[0])
         button_type1(f2_back_button)
         button_type1(f2_open_button)
@@ -297,20 +323,24 @@ if __name__=="__main__":
         #Root Open Close Frame F3
         f3_root_open_close_file_frame.config(background=theme_color[-2])
         button_type1(f3_back_button)
-        f3_head_label.config(background=theme_color[0])
+        f3_head_label.config(background=theme_color[0],fg=theme_color[-1])
         f3_name_listbox_label.config(background=theme_color[-3],fg=theme_color[0])
         f3_name_listbox.config(background=theme_color[-1],fg=theme_color[0],selectbackground=theme_color[-4],selectforeground=theme_color[1])
         
         f3_execution_frame.config(bg=theme_color[-3])
         f3_file_location_label.config(bg=theme_color[-3],fg=theme_color[0])
         f3_file_location_entry.config(bg=theme_color[-1],fg=theme_color[0])
-        f3_head_label.config(fg=theme_color[-1])
         f3_add_botton_frame.config(background=theme_color[-1])
         f3_error_message_label.config(background=theme_color[-1])
         button_type1(f3_execute_button)
         button_type2(f3_destination_button)
         button_type2(f3_add_button)
         button_type2(f3_remove_button)
+
+        #Root Setting Frame F4
+        button_type1(f4_back_button)
+        f4_head_label.config(background=theme_color[0],fg=theme_color[-1])
+
 
     #Root Frame 1
     f1_root_home_frame=tk.Frame(root)
@@ -353,13 +383,12 @@ if __name__=="__main__":
     f1_right_sec.pack(side=tk.RIGHT,expand=1,fill=tk.BOTH)
 
     f1_right_sec_head=tk.Label(f1_right_sec,text="Recent Files")
-    f1_right_sec_head.pack(fill=tk.X,expand=True,side=tk.TOP)
+    f1_right_sec_head.pack(fill=tk.X,side=tk.TOP)
 
     login_btn = tk.PhotoImage(file = "./icon/icon (1).png")
     login_btn2 = tk.PhotoImage(file = "./icon/icon (2).png")
     f1_button=tk.Button(f1_right_sec,image=login_btn,borderwidth=0,command=lambda : f1_button.config(image=login_btn2))
     f1_button.pack()
-    # f1_button.bind("<>",func=lambda : f1_button.config(image=login_btn2))
 
     #Root Frame 2
     f2_root_editor_frame=tk.Frame(root)
@@ -486,13 +515,45 @@ if __name__=="__main__":
     f4_head_label.config(font=(fonts[0],10),)
     f4_head_label.pack(side=tk.RIGHT,expand=True,fill=tk.BOTH)
 
+    # Root Frame 3 Rest Page
+    f4_theme_frame=tk.Frame(f4_root_setting_frame,background=themes_10[config_theme_color][-1])
+    f4_theme_frame.pack(fill=tk.BOTH,expand=True)
+
+    f4_container=tk.Frame(f4_theme_frame)
+    f4_container.pack(expand=True,fill=tk.BOTH,padx=20,pady=20)
+
+    f4_canvas=tk.Canvas(f4_container,background=themes_10[config_theme_color][-2])
+    f4_canvas.pack(side=tk.LEFT,expand=True,fill=tk.BOTH)
+
+    f4_canvas_frame_scroll=tk.Scrollbar(f4_container,orient=tk.VERTICAL,command=f4_canvas.yview)
+    f4_canvas_frame_scroll.pack(side=tk.RIGHT,fill=tk.Y)
+    f4_canvas.config(yscrollcommand=f4_canvas_frame_scroll.set)
+
+    f4_canvas.bind("<Configure>",lambda e: f4_canvas.config(scrollregion=f4_canvas.bbox("all")))
+    f4_canvas.bind("<MouseWheel>",lambda e: f4_canvas.yview_scroll(int(-1*e.delta/120),tk.UNITS))
+    
+    # f4_canvas_frame=tk.Frame(f4_canvas,background="blue")
+    # f4_canvas_frame.pack(expand=True)
+    # # f4_canvas.create_window(0,0,window=f4_canvas_frame,anchor="nw")
+    
+    for i in range(0,900,10):
+        f4_canvas.create_text(0,i,anchor=tk.NW,text="Hello world"+str(i))
+        # tmp_button=tk.Label(f4_canvas,text=str(i))
+        # tmp_button.pack(fill=tk.X,expand=True)
+    
+    # for i in range(50):
+    #     f4_paned_window=tk.PanedWindow(f4_theme_inner_frame,background="light green")
+    #     f4_paned_window.pack(fill=tk.BOTH,expand=True)
+        
+    #     f4_label=tk.Label(f4_paned_window,text="Hwllo WOrld"+str(i))
+    #     f4_label.pack(fill=tk.X)
 
     # Which Page to Be Seen First  
-    # f4_root_setting_frame.tkraise()
+    f4_root_setting_frame.tkraise()
     # f3_root_open_close_file_frame.tkraise()
     # f2_root_editor_frame.tkraise()
-    f1_root_home_frame.tkraise()
-    color_theme(themes_10[config_theme_color])#0,1,2,3,4,5,6,7,8,9
+    # f1_root_home_frame.tkraise()
+    color_theme(themes_10[config_theme_color])
     
     root.protocol("WM_DELETE_WINDOW", window_exit)
     root.mainloop()
