@@ -276,6 +276,10 @@ if __name__=="__main__":
     def f4_back_button_pressed():
         f1_root_home_frame.tkraise()
 
+    # Root F4 Frame
+    def change_color_theme(i):
+        print(i)
+        pass
 
     def color_theme(theme_color):   
         # button Styles
@@ -529,25 +533,29 @@ if __name__=="__main__":
     f4_canvas_frame_scroll.pack(side=tk.RIGHT,fill=tk.Y)
     f4_canvas.config(yscrollcommand=f4_canvas_frame_scroll.set)
 
-    f4_canvas.bind("<Configure>",lambda e: f4_canvas.config(scrollregion=f4_canvas.bbox("all")))
-    f4_canvas.bind("<MouseWheel>",lambda e: f4_canvas.yview_scroll(int(-1*e.delta/120),tk.UNITS))
+    f4_canvas.bind("<Configure>",lambda e: [f4_canvas.config(scrollregion=f4_canvas.bbox("all")),])
+    # f4_canvas.bind("<Configure>",lambda e: print(e.width))
+    f4_canvas.bind_all("<MouseWheel>",lambda e: f4_canvas.yview_scroll(int(-1*e.delta/120),tk.UNITS))
     
-    # f4_canvas_frame=tk.Frame(f4_canvas,background="blue")
-    # f4_canvas_frame.pack(expand=True)
-    # # f4_canvas.create_window(0,0,window=f4_canvas_frame,anchor="nw")
-    
-    for i in range(0,900,10):
-        f4_canvas.create_text(0,i,anchor=tk.NW,text="Hello world"+str(i))
-        # tmp_button=tk.Label(f4_canvas,text=str(i))
-        # tmp_button.pack(fill=tk.X,expand=True)
-    
-    # for i in range(50):
-    #     f4_paned_window=tk.PanedWindow(f4_theme_inner_frame,background="light green")
-    #     f4_paned_window.pack(fill=tk.BOTH,expand=True)
+    for i in range(1,len(themes_10)+1):
         
-    #     f4_label=tk.Label(f4_paned_window,text="Hwllo WOrld"+str(i))
-    #     f4_label.pack(fill=tk.X)
+        f4_inner_frame=tk.Frame(f4_canvas,background="light blue",bd=30)
+        print(10,i*10,f4_canvas.winfo_width())
+        thumb_height=200
+        f4_canvas.create_window(0,i*thumb_height,window=f4_inner_frame,anchor=tk.NW,width=740,height=thumb_height)
+        
+        tmp_color_frame=tk.Frame(f4_inner_frame,bd=2)
+        tmp_color_frame.pack(side=tk.TOP,fill=tk.BOTH,expand=True)
 
+        tmp_button=tk.Button(f4_inner_frame,text="Theme "+str(i),)
+        tmp_button.pack(side=tk.BOTTOM,fill=tk.X)
+
+        for i in themes_10[i-1]:
+            tmp_lable=tk.Label(tmp_color_frame,background=i)
+            tmp_lable.pack(side=tk.LEFT,fill=tk.BOTH,expand=True)
+    
+    # f4_inner_frame.bind("<MouseWheel>",lambda e: [f4_canvas.yview_scroll(int(-1*e.delta/120),tk.UNITS),print(e)])
+    
     # Which Page to Be Seen First  
     f4_root_setting_frame.tkraise()
     # f3_root_open_close_file_frame.tkraise()
