@@ -1,6 +1,6 @@
 # Encryption Decryption Functions
 from os import terminal_size
-from tkinter import YView, font
+from tkinter import Scale, YView, font
 from tkinter.constants import LEFT, RIGHT
 from tkinter.filedialog import test
 from typing import Text
@@ -159,7 +159,7 @@ if __name__=="__main__":
     def f1_open_encrypt_file():
         global file_opened
         filename=filedialog.askopenfilename(
-            # initialdir = "/",
+            initialdir = "/",
             title = "Select an Encrypted File ",
             filetypes = (
                 ("Secret files","*"+file_extension+"*"),
@@ -182,6 +182,11 @@ if __name__=="__main__":
 
     def f1_button_generate_key():
         pass
+
+    def f1_change_theme_button():
+        f4_root_setting_frame.tkraise()
+        # f2_root_editor_frame.tkraise()
+
     #Root F2 buttons 
     def f2_back_button_pressed():
         global file_opened
@@ -210,7 +215,7 @@ if __name__=="__main__":
         # if(file_opened):
         #     f2_save_button_pressed()
         filename=filedialog.askopenfilename(
-            # initialdir = "/",
+            initialdir = "/",
             title = "Select an Encrypted File ",
             filetypes = (
                 ("all files","*.*"),
@@ -240,7 +245,7 @@ if __name__=="__main__":
 
     def f3_add_button_pressed(filetype):
         filename=filedialog.askopenfilename(
-            initialdir = "./",
+            initialdir = "/",
             title = "Select a File ",
             filetypes = filetype,
             # filetypes = (
@@ -281,6 +286,9 @@ if __name__=="__main__":
         f1_root_home_frame.tkraise()
 
     # Root F4 Frame
+    def f4_default_button_pressed():
+        color_theme(themes_10[config_theme_color])
+
     def f4_try_button_pressed():
         if(try_theme!=None):
             print(try_theme)
@@ -335,8 +343,9 @@ if __name__=="__main__":
         f1_root_home_frame.config(background=theme_color[0])
         f1_left_sec_brand.config(background=theme_color[0])
         f1_left_sec_brand_name.config(background=theme_color[0],fg=theme_color[-1])
-        f1_right_sec.config(background=theme_color[-1])
+        f1_right_sec_head_label.config(background=theme_color[-1])
         f1_left_sec_menu.config(background=theme_color[1])
+        button_type2(f1_right_sec_head_button)
         
         button_type1_home_menu(f1_left_sec_menu_button_0)
         button_type1_home_menu(f1_left_sec_menu_button_1)
@@ -396,6 +405,7 @@ if __name__=="__main__":
         f4_footerbar_theme_label.config(background=theme_color[-2],fg=theme_color[1])
         button_type1(f4_footerbar_apply_button)
         button_type2(f4_footerbar_try_button)
+        button_type2(f4_footerbar_default_button)
 
         
     #Root Frame 1
@@ -434,16 +444,27 @@ if __name__=="__main__":
     for i in [f1_left_sec_menu_button_1,f1_left_sec_menu_button_2,f1_left_sec_menu_button_3,f1_left_sec_menu_button_4,f1_left_sec_menu_button_5,f1_left_sec_menu_button_0]:
         i.config(bd=0,font=(fonts[0],12))
 
-    # Root Frame 1 Right Section
+    # Root Frame Right side
     f1_right_sec=tk.Frame(f1_root_home_frame)
-    f1_right_sec.pack(side=tk.RIGHT,expand=1,fill=tk.BOTH)
+    f1_right_sec.pack(fill=tk.BOTH,expand=True)
+    
+    # Root Frame 1 Right Section
+    f1_right_sec_head=tk.Frame(f1_right_sec)
+    f1_right_sec_head.pack(side=tk.TOP,fill=tk.X)
 
-    f1_right_sec_head=tk.Label(f1_right_sec,text="Recent Files")
-    f1_right_sec_head.pack(fill=tk.X,side=tk.TOP)
+    f1_right_sec_head_label=tk.Label(f1_right_sec_head,text="Recent Files",font=theme_font[0])
+    f1_right_sec_head_label.pack(fill=tk.BOTH,side=tk.LEFT,expand=True)
+
+    f1_right_sec_head_button=tk.Button(f1_right_sec_head,text="Change Theme",bd=0,font=theme_font[0],command=f1_change_theme_button)
+    f1_right_sec_head_button.pack(side=tk.RIGHT,fill=tk.BOTH)
+
+    # Root Frame 1 Right Sec rest page
+    f1_right_sec_rest=tk.Frame(f1_right_sec)
+    f1_right_sec_rest.pack(side=tk.BOTTOM,fill=tk.BOTH,expand=True)
 
     login_btn = tk.PhotoImage(file = "./icon/icon (1).png")
     login_btn2 = tk.PhotoImage(file = "./icon/icon (2).png")
-    f1_button=tk.Button(f1_right_sec,image=login_btn,borderwidth=0,command=lambda : f1_button.config(image=login_btn2))
+    f1_button=tk.Button(f1_right_sec_rest,image=login_btn,borderwidth=0,command=lambda : f1_button.config(image=login_btn2))
     f1_button.pack()
 
     #Root Frame 2
@@ -461,7 +482,6 @@ if __name__=="__main__":
     f2_open_button=tk.Button(f2_head,text="Open",command=f2_open_button_pressed)
     f2_open_button.config(bd=0,font=(fonts[0],10))
     f2_open_button.pack(side=tk.RIGHT,fill=tk.BOTH,ipadx=3,ipady=3)
-    # f2_open_button.config(state=tk.DISABLED)
 
     f2_save_button=tk.Button(f2_head,text="Save",command=f2_save_button_pressed)
     f2_save_button.config(bd=0,font=(fonts[0],10))
@@ -513,9 +533,6 @@ if __name__=="__main__":
     f3_name_listbox.config(font=theme_font[0])
     f3_name_listbox.pack(expand=True,side=tk.LEFT,fill=tk.BOTH)
 
-    for i in range(50):
-        f3_name_listbox.insert(i,"hello "+str(i))
-    
     f3_scroll=tk.Scrollbar(f3_name_listbox_frame,command=f3_name_listbox.yview,orient=tk.VERTICAL)
     f3_name_listbox.config(yscrollcommand=f3_scroll.set)
     f3_scroll.pack(side=tk.RIGHT,fill=tk.Y)
@@ -641,12 +658,15 @@ if __name__=="__main__":
 
     f4_footerbar_try_button=tk.Button(f4_footerbar,text="Try",font=theme_font[0],bd=0,command=f4_try_button_pressed)
     f4_footerbar_try_button.pack(side=tk.RIGHT,fill=tk.BOTH,ipady=2,ipadx=30)
+
+    f4_footerbar_default_button=tk.Button(f4_footerbar,text="Default",font=theme_font[0],bd=0,command=f4_default_button_pressed)
+    f4_footerbar_default_button.pack(side=tk.RIGHT,fill=tk.BOTH,ipady=2,ipadx=30)
     
     # Which Page to Be Seen First  
-    f4_root_setting_frame.tkraise()
+    # f4_root_setting_frame.tkraise()
     # f3_root_open_close_file_frame.tkraise()
     # f2_root_editor_frame.tkraise()
-    # f1_root_home_frame.tkraise()
+    f1_root_home_frame.tkraise()
     color_theme(themes_10[config_theme_color])
     
     root.protocol("WM_DELETE_WINDOW", window_exit)
