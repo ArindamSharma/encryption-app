@@ -277,9 +277,14 @@ if __name__=="__main__":
         f1_root_home_frame.tkraise()
 
     # Root F4 Frame
-    def change_color_theme(i):
-        print(i)
-        pass
+    def change_theme_button_pressed(i):
+        color_theme(themes_10[i])
+    
+    def canvas_config(e):
+        f4_canvas.config(scrollregion=f4_canvas.bbox("all"))
+        print(e)
+        f4_canvas.itemconfig(tk.ALL,width=e.width)
+        # f4_canvas.itemconfig(f4_inner_frame_id,x=(e.width-thumb_width)/2)
 
     def color_theme(theme_color):   
         # button Styles
@@ -297,6 +302,13 @@ if __name__=="__main__":
             widget.config(background=theme_color[1],activebackground=theme_color[1],fg=theme_color[-1])
             widget.bind("<Enter>",func=lambda e: widget.config(fg=theme_color[4]))
             widget.bind("<Leave>",func=lambda e: widget.config(fg=theme_color[-1]))
+
+        def button_type1_theme(widget,i):
+            widget.config(background=theme_color[0],activebackground=theme_color[0],fg=theme_color[-1])
+            widget.bind("<Enter>",func=lambda e: widget.config(bg=theme_color[-5],fg=theme_color[1]))
+            widget.bind("<Leave>",func=lambda e: widget.config(bg=theme_color[0],fg=theme_color[-1]))
+            widget.config(command=lambda:change_theme_button_pressed(i))
+            pass
         
         # Root
         root.configure(background=theme_color[0])
@@ -344,8 +356,22 @@ if __name__=="__main__":
         #Root Setting Frame F4
         button_type1(f4_back_button)
         f4_head_label.config(background=theme_color[0],fg=theme_color[-1])
-
-
+        f4_theme_frame.config(background=theme_color[-1])
+        f4_canvas.config(background=theme_color[-2])
+        for i in f4_canvas_details["f4_inner_frame"]:
+            i.config(background=theme_color[-2])
+            
+        button_type1_theme(f4_canvas_details["tmp_button"][0],0)
+        button_type1_theme(f4_canvas_details["tmp_button"][1],1)
+        button_type1_theme(f4_canvas_details["tmp_button"][2],2)
+        button_type1_theme(f4_canvas_details["tmp_button"][3],3)
+        button_type1_theme(f4_canvas_details["tmp_button"][4],4)
+        button_type1_theme(f4_canvas_details["tmp_button"][5],5)
+        button_type1_theme(f4_canvas_details["tmp_button"][6],6)
+        button_type1_theme(f4_canvas_details["tmp_button"][7],7)
+        button_type1_theme(f4_canvas_details["tmp_button"][8],8)
+        button_type1_theme(f4_canvas_details["tmp_button"][9],9)
+        
     #Root Frame 1
     f1_root_home_frame=tk.Frame(root)
     f1_root_home_frame.grid(row=0,column=0,sticky=tk.N+tk.E+tk.W+tk.S,)
@@ -507,7 +533,7 @@ if __name__=="__main__":
     f4_root_setting_frame=tk.Frame(root)
     f4_root_setting_frame.grid(row=0,column=0,sticky=tk.N+tk.E+tk.W+tk.S,)
 
-    # Root Frame 3 Head Bar
+    # Root Frame 4 Head Bar
     f4_head=tk.Frame(f4_root_setting_frame)
     f4_head.pack(side=tk.TOP,fill=tk.X)
 
@@ -519,42 +545,58 @@ if __name__=="__main__":
     f4_head_label.config(font=(fonts[0],10),)
     f4_head_label.pack(side=tk.RIGHT,expand=True,fill=tk.BOTH)
 
-    # Root Frame 3 Rest Page
-    f4_theme_frame=tk.Frame(f4_root_setting_frame,background=themes_10[config_theme_color][-1])
+    # Root Frame 4 Rest Page
+    f4_theme_frame=tk.Frame(f4_root_setting_frame)
     f4_theme_frame.pack(fill=tk.BOTH,expand=True)
 
     f4_container=tk.Frame(f4_theme_frame)
     f4_container.pack(expand=True,fill=tk.BOTH,padx=20,pady=20)
 
-    f4_canvas=tk.Canvas(f4_container,background=themes_10[config_theme_color][-2])
+    f4_canvas=tk.Canvas(f4_container)
     f4_canvas.pack(side=tk.LEFT,expand=True,fill=tk.BOTH)
 
     f4_canvas_frame_scroll=tk.Scrollbar(f4_container,orient=tk.VERTICAL,command=f4_canvas.yview)
     f4_canvas_frame_scroll.pack(side=tk.RIGHT,fill=tk.Y)
     f4_canvas.config(yscrollcommand=f4_canvas_frame_scroll.set)
+    
+    f4_canvas_details={
+        "theme_id":[],
+        "f4_inner_frame":[],
+        "f4_inner_frame_id":[],
+        "tmp_color_frame":[],
+        "tmp_button":[],
+        "tmp_color_label":[],
+    }
+    thumb_height=200
+    thumb_width=743
+    for i in range(1,len(themes_10)+1):
+        f4_canvas_details["theme_id"].append(i-1)
+        f4_canvas_details["f4_inner_frame"].append(
+            tk.Frame(f4_canvas,bd=30)
+        )
+        # print(10,i*10,f4_canvas.winfo_width())
+        f4_canvas_details["f4_inner_frame_id"].append(
+            f4_canvas.create_window(0,i*thumb_height,window=f4_canvas_details["f4_inner_frame"][-1],anchor=tk.NW,width=thumb_width,height=thumb_height)
+        )
+        
+        f4_canvas_details["tmp_color_frame"].append(
+            tk.Frame(f4_canvas_details["f4_inner_frame"][-1],bd=2)
+        )
+        f4_canvas_details["tmp_color_frame"][-1].pack(side=tk.TOP,fill=tk.BOTH,expand=True)
 
-    f4_canvas.bind("<Configure>",lambda e: [f4_canvas.config(scrollregion=f4_canvas.bbox("all")),])
-    # f4_canvas.bind("<Configure>",lambda e: print(e.width))
+        f4_canvas_details["tmp_button"].append(
+            tk.Button(f4_canvas_details["tmp_color_frame"][-1],text="Theme "+str(i),bd=0,font=(fonts[0],10))
+        )
+        f4_canvas_details["tmp_button"][-1].pack(side=tk.BOTTOM,fill=tk.X)
+
+        f4_canvas_details["tmp_color_label"].append([])
+        for i in themes_10[i-1]:
+            f4_canvas_details["tmp_color_label"][-1].append(tk.Label(f4_canvas_details["tmp_color_frame"][-1],background=i))
+            f4_canvas_details["tmp_color_label"][-1][-1].pack(side=tk.LEFT,fill=tk.BOTH,expand=True)
+    
+    f4_canvas.bind("<Configure>",func=canvas_config)
     f4_canvas.bind_all("<MouseWheel>",lambda e: f4_canvas.yview_scroll(int(-1*e.delta/120),tk.UNITS))
     
-    for i in range(1,len(themes_10)+1):
-        
-        f4_inner_frame=tk.Frame(f4_canvas,background="light blue",bd=30)
-        print(10,i*10,f4_canvas.winfo_width())
-        thumb_height=200
-        f4_canvas.create_window(0,i*thumb_height,window=f4_inner_frame,anchor=tk.NW,width=740,height=thumb_height)
-        
-        tmp_color_frame=tk.Frame(f4_inner_frame,bd=2)
-        tmp_color_frame.pack(side=tk.TOP,fill=tk.BOTH,expand=True)
-
-        tmp_button=tk.Button(f4_inner_frame,text="Theme "+str(i),)
-        tmp_button.pack(side=tk.BOTTOM,fill=tk.X)
-
-        for i in themes_10[i-1]:
-            tmp_lable=tk.Label(tmp_color_frame,background=i)
-            tmp_lable.pack(side=tk.LEFT,fill=tk.BOTH,expand=True)
-    
-    # f4_inner_frame.bind("<MouseWheel>",lambda e: [f4_canvas.yview_scroll(int(-1*e.delta/120),tk.UNITS),print(e)])
     
     # Which Page to Be Seen First  
     f4_root_setting_frame.tkraise()
