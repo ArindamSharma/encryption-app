@@ -1,6 +1,9 @@
 # Encryption Decryption Functions
-from tkinter import YView
+from os import terminal_size
+from tkinter import YView, font
 from tkinter.constants import LEFT, RIGHT
+from tkinter.filedialog import test
+from typing import Text
 
 
 def generate_key():
@@ -45,15 +48,15 @@ if __name__=="__main__":
     themes_10=[
         # https://coolors.co/ 
         # Order Dark to Light
-        ["#ffe169","#fad643","#edc531","#dbb42c","#c9a227","#b69121","#a47e1b","#926c15","#805b10","#76520e"],  #yelloish
-        ["#0466c8","#0353a4","#023e7d","#002855","#001845","#001233","#33415c","#5c677d","#7d8597","#979dac"],  #bluish
+        ["#ffe169","#fad643","#edc531","#dbb42c","#c9a227","#b69121","#a47e1b","#926c15","#805b10","#76520e"][::-1],  #yelloish
+        ["#001233","#001845","#002855","#023E7D","#0353A4","#0466C8","#33415C","#5C677D","#7D8597","#979DAC"],  #bluish
         ["#036666","#14746f","#248277","#358f80","#469d89","#56ab91","#67b99a","#78c6a3","#88d4ab","#99e2b4"],  #grennish
         ["#582F0E","#333D29","#414833","#7F4F24","#656D4A","#936639","#A68A64","#A4AC86","#B6AD90","#C2C5AA"],  #browngreen
-        ["#edc4b3","#e6b8a2","#deab90","#d69f7e","#cd9777","#c38e70","#b07d62","#9d6b53","#8a5a44","#774936"],  # skincolor
+        ["#edc4b3","#e6b8a2","#deab90","#d69f7e","#cd9777","#c38e70","#b07d62","#9d6b53","#8a5a44","#774936"][::-1],  # skincolor
         ["#012a4a","#013a63","#01497c","#014f86","#2a6f97","#2c7da0","#468faf","#61a5c2","#89c2d9","#a9d6e5"],  #bluish
         ["#03071e","#370617","#6a040f","#9d0208","#d00000","#dc2f02","#e85d04","#f48c06","#faa307","#ffba08"],  #redyellow
         ["#001219","#9B2226","#AE2012","#005F73","#BB3E03","#CA6702","#0A9396","#EE9B00","#94D2BD","#E9D8A6"],  #blueyellowred
-        ["#d9ed92","#b5e48c","#99d98c","#76c893","#52b69a","#34a0a4","#168aad","#1a759f","#1e6091","#184e77"],  #yellowishgreenblue
+        ["#d9ed92","#b5e48c","#99d98c","#76c893","#52b69a","#34a0a4","#168aad","#1a759f","#1e6091","#184e77"][::-1],  #yellowishgreenblue
         ["#583101","#603808","#6f4518","#8b5e34","#a47148","#bc8a5f","#d4a276","#e7bc91","#f3d5b5","#ffedd8"],  #brownish
 
     ]
@@ -274,15 +277,30 @@ if __name__=="__main__":
     
     # Root F3 Buttons
     def f4_back_button_pressed():
+        color_theme(themes_10[config_theme_color])
         f1_root_home_frame.tkraise()
 
     # Root F4 Frame
-    def change_theme_button_pressed(i):
-        color_theme(themes_10[i])
+    def f4_try_button_pressed():
+        if(try_theme!=None):
+            print(try_theme)
+            color_theme(themes_10[try_theme])
+
+    def f4_apply_button_pressed():
+        global config_theme_color
+        if(try_theme!=None):
+            print(try_theme)
+            color_theme(themes_10[try_theme])
+            config_theme_color=try_theme
+
+    def f4_theme_button_pressed(i):
+        global try_theme
+        try_theme=i
+        f4_footerbar_theme_label.config(text="Theme "+str(try_theme+1))
     
     def canvas_config(e):
         f4_canvas.config(scrollregion=f4_canvas.bbox("all"))
-        print(e)
+        # print(e)
         f4_canvas.itemconfig(tk.ALL,width=e.width)
         # f4_canvas.itemconfig(f4_inner_frame_id,x=(e.width-thumb_width)/2)
 
@@ -307,7 +325,7 @@ if __name__=="__main__":
             widget.config(background=theme_color[0],activebackground=theme_color[0],fg=theme_color[-1])
             widget.bind("<Enter>",func=lambda e: widget.config(bg=theme_color[-5],fg=theme_color[1]))
             widget.bind("<Leave>",func=lambda e: widget.config(bg=theme_color[0],fg=theme_color[-1]))
-            widget.config(command=lambda:change_theme_button_pressed(i))
+            widget.config(command=lambda:f4_theme_button_pressed(i))
             pass
         
         # Root
@@ -356,7 +374,9 @@ if __name__=="__main__":
         #Root Setting Frame F4
         button_type1(f4_back_button)
         f4_head_label.config(background=theme_color[0],fg=theme_color[-1])
-        f4_theme_frame.config(background=theme_color[-1])
+        f4_theme_frame.config(background=theme_color[3])
+        f4_container.config(background=theme_color[-1])
+        f4_theme_label.config(background=theme_color[3],fg=theme_color[-1])
         f4_canvas.config(background=theme_color[-2])
         for i in f4_canvas_details["f4_inner_frame"]:
             i.config(background=theme_color[-2])
@@ -371,6 +391,12 @@ if __name__=="__main__":
         button_type1_theme(f4_canvas_details["tmp_button"][7],7)
         button_type1_theme(f4_canvas_details["tmp_button"][8],8)
         button_type1_theme(f4_canvas_details["tmp_button"][9],9)
+
+        f4_footerbar_label.config(background=theme_color[-2],fg=theme_color[1])
+        f4_footerbar_theme_label.config(background=theme_color[-2],fg=theme_color[1])
+        button_type1(f4_footerbar_apply_button)
+        button_type2(f4_footerbar_try_button)
+
         
     #Root Frame 1
     f1_root_home_frame=tk.Frame(root)
@@ -550,7 +576,10 @@ if __name__=="__main__":
     f4_theme_frame.pack(fill=tk.BOTH,expand=True)
 
     f4_container=tk.Frame(f4_theme_frame)
-    f4_container.pack(expand=True,fill=tk.BOTH,padx=20,pady=20)
+    f4_container.pack(side=tk.TOP,expand=True,fill=tk.BOTH,padx=20,pady=20)
+
+    f4_theme_label=tk.Label(f4_container,text="Plese Select a Theme give below and see the change",anchor=tk.W,font=theme_font[0])
+    f4_theme_label.pack(side=tk.TOP,fill=tk.X)
 
     f4_canvas=tk.Canvas(f4_container)
     f4_canvas.pack(side=tk.LEFT,expand=True,fill=tk.BOTH)
@@ -567,12 +596,13 @@ if __name__=="__main__":
         "tmp_button":[],
         "tmp_color_label":[],
     }
-    thumb_height=200
+    thumb_height=250
     thumb_width=743
+    try_theme=None
     for i in range(1,len(themes_10)+1):
         f4_canvas_details["theme_id"].append(i-1)
         f4_canvas_details["f4_inner_frame"].append(
-            tk.Frame(f4_canvas,bd=30)
+            tk.Frame(f4_canvas,bd=50)
         )
         # print(10,i*10,f4_canvas.winfo_width())
         f4_canvas_details["f4_inner_frame_id"].append(
@@ -597,6 +627,20 @@ if __name__=="__main__":
     f4_canvas.bind("<Configure>",func=canvas_config)
     f4_canvas.bind_all("<MouseWheel>",lambda e: f4_canvas.yview_scroll(int(-1*e.delta/120),tk.UNITS))
     
+    f4_footerbar=tk.Frame(f4_theme_frame)
+    f4_footerbar.pack(side=tk.BOTTOM,fill=tk.BOTH,padx=20,pady=20)
+
+    f4_footerbar_label=tk.Label(f4_footerbar,text="Selected Theme : ",anchor=tk.W,font=theme_font[0])
+    f4_footerbar_label.pack(side=tk.LEFT,fill=tk.BOTH)
+
+    f4_footerbar_theme_label=tk.Label(f4_footerbar,text=str(try_theme),anchor=tk.W,font=theme_font[0])
+    f4_footerbar_theme_label.pack(side=tk.LEFT,expand=True,fill=tk.BOTH)
+
+    f4_footerbar_apply_button=tk.Button(f4_footerbar,text="Apply",font=theme_font[0],bd=0,command=f4_apply_button_pressed)
+    f4_footerbar_apply_button.pack(side=tk.RIGHT,fill=tk.BOTH,ipady=2,ipadx=30)
+
+    f4_footerbar_try_button=tk.Button(f4_footerbar,text="Try",font=theme_font[0],bd=0,command=f4_try_button_pressed)
+    f4_footerbar_try_button.pack(side=tk.RIGHT,fill=tk.BOTH,ipady=2,ipadx=30)
     
     # Which Page to Be Seen First  
     f4_root_setting_frame.tkraise()
