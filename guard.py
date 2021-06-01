@@ -1,11 +1,3 @@
-# Encryption Decryption Functions
-from os import terminal_size
-from tkinter import Scale, YView, font
-from tkinter.constants import LEFT, RIGHT
-from tkinter.filedialog import test
-from typing import Text
-
-
 def generate_key():
     key = Fernet.generate_key()
     with open("secret.key", "wb") as key_file:
@@ -29,6 +21,7 @@ def decrypt_message(encrypted_message):
 
 if __name__=="__main__":
     try:
+        # print("Trying Packages")
         import tkinter as tk
         from tkinter import filedialog
         from cryptography.fernet import Fernet
@@ -36,7 +29,8 @@ if __name__=="__main__":
         import os
         print("Module Not Found ")
         print("Installing Module")
-        os.system("pip install cryptography")
+        os.system("pip3 install cryptography")
+        os.system("sudo apt-get install python3-tk")
         print("Complete Installation")
         print("Re-run the code")
         exit()
