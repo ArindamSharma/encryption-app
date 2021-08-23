@@ -1,10 +1,18 @@
+def print_debug(*string):
+    global env
+    if(env):
+        print("[Debug]","".join([str(i) for i in string]))
+
+def print_info(*string):
+    print("[info]","".join([str(i) for i in string]))
+
 def generate_key():
     key = Fernet.generate_key()
-    with open("secret.key", "wb") as key_file:
+    with open("secret.key", "w") as key_file:
         key_file.write(key)
 
 def load_key():
-    return open("secret.key", "rb").read()
+    return open("secret.key", "r").read()
 
 def encrypt_message(message):
     key = load_key()
@@ -20,23 +28,27 @@ def decrypt_message(encrypted_message):
     return decrypted_message.decode()
 
 if __name__=="__main__":
+    import sys
     try:
-        # print("Trying Packages")
+        # print_debug("Trying Packages")
         import tkinter as tk
         from tkinter import filedialog
         from cryptography.fernet import Fernet
     except ModuleNotFoundError:
         import os
-        print("Module Not Found ")
-        print("Installing Module")
+        print_info("Module Not Found ")
+        print_info("Installing Module")
         os.system("pip3 install cryptography")
         os.system("sudo apt-get install python3-tk")
-        print("Complete Installation") 
-        print("Re-run the code")
+        print_info("Complete Installation") 
+        print_info("Re-run the code")
         exit()
     # generate_key()
 
     # Pre Define Varibales
+    env=False
+    if(len(sys.argv)>1):
+        env=sys.argv[1]=="debug"
     file_extension=".secret"
     file_opened=None
     themes_10=[
@@ -78,15 +90,15 @@ if __name__=="__main__":
     
     # Reading Config File 
     try:
-        config_file=open(config_file_name,"rb+")
-        config_file_data=[i.decode().strip("\n") for i in config_file.readlines()]
+        config_file=open(config_file_name,"r+")
+        config_file_data=[i.strip("\n") for i in config_file.readlines()]
         if(len(config_file_data)!=3 or config_file_data[0][:11]!="new_recent:" or config_file_data[1][:11]!="old_recent:" or config_file_data[2][:12]!="color_theme:"):
             raise FileNotFoundError
-        # print(config_file_data)
+        # print_debug(config_file_data)
         try:
             if(config_file_data[0][11:-1].strip(",")!=''):
                 config_new_recent=[i.strip(" ") for i in config_file_data[0][11:].strip(",").split(",")]
-            # print(config_new_recent)
+            # print_debug(config_new_recent)
             config_theme_color=int(config_file_data[2][12:])
             if(config_file_data[1][11:-1].strip(",")!=''):
                 for i in config_file_data[1][11:].strip(",").split(","):
@@ -94,7 +106,7 @@ if __name__=="__main__":
                     if(i.strip(" ")=='' or len(tmp)==1):
                         raise FileNotFoundError
                     config_old_recent.append([tmp[0],int(tmp[1])])
-            # print(config_old_recent)
+            # print_debug(config_old_recent)
         except:
             raise FileNotFoundError
         config_file.close()
@@ -103,19 +115,19 @@ if __name__=="__main__":
     
     #Functions
     def window_exit():
-        # print("Configure File")       
-        config_file=open(config_file_name,"wb")
-        config_file.write("new_recent:".encode())
+        # print_debug("Configure File")       
+        config_file=open(config_file_name,"w")
+        config_file.write("new_recent:")
         for i in config_new_recent:
-            config_file.write((i+",").encode())
-        config_file.write(("\n").encode())
-        config_file.write("old_recent:".encode())
+            config_file.write((i+","))
+        config_file.write(("\n"))
+        config_file.write("old_recent:")
         for i in config_old_recent:
-            config_file.write((i[0]+"|"+str(i[1])+",").encode())
-        config_file.write(("\n").encode())
-        config_file.write(("color_theme:"+str(config_theme_color)).encode())
+            config_file.write((i[0]+"|"+str(i[1])+","))
+        config_file.write(("\n"))
+        config_file.write(("color_theme:"+str(config_theme_color)))
         config_file.close()
-        print("Have a Nice Day")
+        print_debug("Have a Nice Day")
         root.destroy()
         
     def add_new_file_to_recent(filename):
@@ -132,6 +144,13 @@ if __name__=="__main__":
             config_new_recent.insert(0,filename)
             if(len(config_new_recent)>config_new_recent_max):
                 config_new_recent.pop()
+
+    def update_file(filename,data):
+        tmp_file=open(filename,"w+")
+        tmp_file.seek(0)
+        tmp_file.truncate(0)
+        tmp_file.write(data)
+        tmp_file.close()
 
     # Root Home F1 BUttons 
     def f1_exit_button():
@@ -151,7 +170,7 @@ if __name__=="__main__":
         f3_root_open_close_file_frame.tkraise()
 
     def f1_open_encrypt_file():
-        global file_opened
+        global file_opened,f2_head_label_text
         filename=filedialog.askopenfilename(
             initialdir = "/",
             title = "Select an Encrypted File ",
@@ -162,12 +181,12 @@ if __name__=="__main__":
         )
         if(filename):
             file_opened=filename
-            # print(file_opened)
+            # print_debug(file_opened)
             f2_root_editor_frame.tkraise()
-            f2_head_label.config(text="Text Editor : Selected File :- "+filename.split("/")[-1])
-            data=open(file_opened,"rb+")
-            # f2_test_area.insert(tk.END, decrypt_message(data.read()))
-            f2_test_area.insert(tk.END, data.read())
+            f2_head_label_text.set("Text Editor : "+filename.split("/")[-1])
+            data=open(file_opened,"r+")
+            # f2_text_area.insert(tk.END, decrypt_message(data.read()))
+            f2_text_area.insert(tk.END, data.read())
             data.close()
             add_new_file_to_recent(filename)
 
@@ -183,31 +202,49 @@ if __name__=="__main__":
 
     #Root F2 buttons 
     def f2_back_button_pressed():
-        global file_opened
-        f2_test_area.delete(1.0,tk.END) # For clearing 
-        f2_head_label.config(text="Text Editor : No File Selected ")
+        global file_opened,f2_head_label_text
+        f2_text_area.delete(1.0,tk.END) # For clearing 
+        f2_head_label_text.set("Text Editor : No File Selected ")
         # if(file_opened):
             # f2_save_button_pressed()
-        f2_save_button.config(state=tk.DISABLED)
+        # f2_save_button.config(state=tk.DISABLED)
         file_opened=None
         f1_root_home_frame.tkraise()
 
+    def f2_text_area_changed(e):
+        tmp=f2_head_label_text.get()
+        if(tmp[-1]!='*'):
+            f2_head_label_text.set(tmp+"*")
+    
     def f2_save_button_pressed():
-        print("Saveing button Pressed")
-        data=open(file_opened,"rb+")
-        data.seek(0)
-        data.truncate(0)
-        data.write(f2_test_area.get(1.0,tk.END).encode())
-        # data.write(encrypt_message(f2_test_area.get(1.0,tk.END)).encode())
-        f2_test_area.insert(tk.END, data.read())
-        data.close()
-        print("File Saved")
-        pass
+        global file_opened,f2_head_label_text
+        print_debug("Saving button Pressed")
+        if(file_opened):    
+            update_file(file_opened,f2_text_area.get(1.0,tk.END))
+            if(f2_head_label_text.get()[-1]=='*'):
+                f2_head_label_text.set(f2_head_label_text.get()[:-1])
+            print_debug("File Saved")
+        else:
+            filename=filedialog.asksaveasfilename(
+                initialdir = "/",
+                initialfile="Untiteled.txt",
+                title = "Select a File Name",
+                filetypes=(
+                    ("Text files", "*.txt"),
+                    ("All files", "*.*"),
+                    # ("Secret files","*"+file_extension+"*"),
+                ),
+            )
+            if(filename):
+                file_opened=filename
+                print_debug(file_opened,f2_text_area.get(1.0,tk.END))
+                update_file(file_opened,f2_text_area.get(1.0,tk.END))
+                f2_head_label_text.set("Text Editor : "+file_opened)
+                if(f2_head_label_text.get()[-1]=='*'):
+                    f2_head_label_text.set(f2_head_label_text.get()[:-1])
 
     def f2_open_button_pressed():
-        global file_opened
-        # if(file_opened):
-        #     f2_save_button_pressed()
+        global file_opened,f2_head_label_text
         filename=filedialog.askopenfilename(
             initialdir = "/",
             title = "Select an Encrypted File ",
@@ -217,16 +254,16 @@ if __name__=="__main__":
             ),
         )
         if(filename):
-            f2_test_area.delete(1.0,tk.END)
             file_opened=filename
+            f2_text_area.delete(1.0,tk.END)
             # f2_root_editor_frame.tkraise()
-            f2_head_label.config(text="Text Editor : Selected File :- "+filename.split("/")[-1])
+            f2_head_label_text.set("Text Editor : "+file_opened.split("/")[-1])
             f2_save_button.config(state=tk.NORMAL)       
-            data=open(filename,"rb+")
-            # f2_test_area.insert(tk.END, decrypt_message(data.read()))
-            f2_test_area.insert(tk.END, data.read())
+            data=open(file_opened,"r+")
+            # f2_text_area.insert(tk.END, decrypt_message(data.read()))
+            f2_text_area.insert(tk.END, data.read())
             data.close()
-            add_new_file_to_recent(filename)
+            add_new_file_to_recent(file_opened)
 
     # Root F3 Buttons
     def f3_back_button_pressed():
@@ -262,15 +299,15 @@ if __name__=="__main__":
             f3_error_message_label.config(text="")
 
     def f3_execute_button_pressed():
-        print(f3_name_listbox.get(0,f3_name_listbox.size()))
+        print_debug(f3_name_listbox.get(0,f3_name_listbox.size()))
 
     def f3_decrypt_button_pressed():
-        print(f3_name_listbox.get(0,f3_name_listbox.size()))
+        print_debug(f3_name_listbox.get(0,f3_name_listbox.size()))
 
     def f3_select_destination_button_pressed():
         filedir=filedialog.askdirectory()
         if(filedir):
-            # print(filedir)
+            # print_debug(filedir)
             f3_file_location_entry.delete(0,tk.END)
             f3_file_location_entry.insert(0,filedir)
     
@@ -285,13 +322,13 @@ if __name__=="__main__":
 
     def f4_try_button_pressed():
         if(try_theme!=None):
-            print(try_theme)
+            print_debug(try_theme)
             color_theme(themes_10[try_theme])
 
     def f4_apply_button_pressed():
         global config_theme_color
         if(try_theme!=None):
-            print(try_theme)
+            print_debug(try_theme)
             color_theme(themes_10[try_theme])
             config_theme_color=try_theme
 
@@ -302,7 +339,7 @@ if __name__=="__main__":
     
     def canvas_config(e):
         f4_canvas.config(scrollregion=f4_canvas.bbox("all"))
-        # print(e)
+        # print_debug(e)
         f4_canvas.itemconfig(tk.ALL,width=e.width)
         # f4_canvas.itemconfig(f4_inner_frame_id,x=(e.width-thumb_width)/2)
 
@@ -354,7 +391,7 @@ if __name__=="__main__":
         button_type1(f2_open_button)
         button_type1(f2_save_button)
         f2_head_label.config(background=theme_color[0],fg=theme_color[-1])
-        f2_test_area.config(background=theme_color[-1],selectbackground=theme_color[-2],fg=theme_color[0])
+        f2_text_area.config(background=theme_color[-1],selectbackground=theme_color[-2],fg=theme_color[0])
         f2_text_box_frame.config(bg="Black")
 
         #Root Open Close Frame F3
@@ -480,20 +517,23 @@ if __name__=="__main__":
     f2_save_button=tk.Button(f2_head,text="Save",command=f2_save_button_pressed)
     f2_save_button.config(bd=0,font=(fonts[0],10))
     f2_save_button.pack(side=tk.RIGHT,fill=tk.BOTH,ipadx=3,ipady=3)
-    f2_save_button.config(state=tk.DISABLED)
+    # f2_save_button.config(state=tk.DISABLED)
 
-    f2_head_label=tk.Label(f2_head,text="Text Editor : No File Selected")
+    f2_head_label_text=tk.StringVar()
+    f2_head_label=tk.Label(f2_head,textvariable=f2_head_label_text)
     f2_head_label.config(font=(fonts[0],10))
+    f2_head_label_text.set("Text Editor : No File Selected")
     f2_head_label.pack(side=tk.RIGHT,expand=True,fill=tk.BOTH)
     
     # Root Frame 2 Rest Page
     f2_text_box_frame=tk.Frame(f2_root_editor_frame)
     f2_text_box_frame.pack(fill=tk.BOTH,expand=True,padx=5,pady=5)
 
-    f2_test_area = tk.Text(f2_text_box_frame,bd=0,height=1,width=1,font=("Corbel", 12),undo=True)
-    f2_test_area.pack(side=tk.LEFT,expand=True,fill=tk.BOTH)
-    f2_text_area_scrollbar=tk.Scrollbar(f2_text_box_frame,command=f2_test_area.yview)
-    f2_test_area.config(yscrollcommand=f2_text_area_scrollbar.set)
+    f2_text_area = tk.Text(f2_text_box_frame,bd=0,height=1,width=1,font=("Corbel", 12),undo=True)
+    f2_text_area.pack(side=tk.LEFT,expand=True,fill=tk.BOTH)
+    f2_text_area.bind("<KeyPress>",func=f2_text_area_changed)
+    f2_text_area_scrollbar=tk.Scrollbar(f2_text_box_frame,command=f2_text_area.yview)
+    f2_text_area.config(yscrollcommand=f2_text_area_scrollbar.set)
     f2_text_area_scrollbar.pack(side=tk.RIGHT,fill=tk.BOTH)
 
     #Root Frame 3
@@ -615,7 +655,7 @@ if __name__=="__main__":
         f4_canvas_details["f4_inner_frame"].append(
             tk.Frame(f4_canvas,bd=50)
         )
-        # print(10,i*10,f4_canvas.winfo_width())
+        # print_debug(10,i*10,f4_canvas.winfo_width())
         f4_canvas_details["f4_inner_frame_id"].append(
             f4_canvas.create_window(0,i*thumb_height,window=f4_canvas_details["f4_inner_frame"][-1],anchor=tk.NW,width=thumb_width,height=thumb_height)
         )
