@@ -1,10 +1,12 @@
 def print_debug(*string):
     global env
-    if(env):
+    if(env=="debug"):
         print("[Debug]","".join([str(i) for i in string]))
 
 def print_info(*string):
-    print("[info]","".join([str(i) for i in string]))
+    global env
+    if(env=="staging" or env=="debug"):
+        print("[info]","".join([str(i) for i in string]))
 
 def generate_key():
     key = Fernet.generate_key()
@@ -29,6 +31,9 @@ def decrypt_message(encrypted_message):
 
 if __name__=="__main__":
     import sys
+
+    # Pre Define Varibales
+    env=False
     try:
         # print_debug("Trying Packages")
         import tkinter as tk
@@ -45,10 +50,9 @@ if __name__=="__main__":
         exit()
     # generate_key()
 
-    # Pre Define Varibales
-    env=False
+    # pre_define_env=["staging","debug"]
     if(len(sys.argv)>1):
-        env=sys.argv[1]=="debug"
+        env=sys.argv[1]
     file_extension=".secret"
     file_opened=None
     themes_10=[
@@ -239,6 +243,7 @@ if __name__=="__main__":
                 file_opened=filename
                 print_debug(file_opened,f2_text_area.get(1.0,tk.END))
                 update_file(file_opened,f2_text_area.get(1.0,tk.END))
+                add_new_file_to_recent(file_opened)
                 f2_head_label_text.set("Text Editor : "+file_opened)
                 if(f2_head_label_text.get()[-1]=='*'):
                     f2_head_label_text.set(f2_head_label_text.get()[:-1])
@@ -279,15 +284,17 @@ if __name__=="__main__":
             initialdir = "/",
             title = "Select a File ",
             filetypes = filetype,
+            multiple=True
             # filetypes = (
             #     ("Text files","*.txt*"),
             #     ("all files","*.*")
             # ),
         )
-        if(filename):    
-            f3_name_listbox.insert(tk.END,filename)
-            f3_remove_button.config(state=tk.NORMAL)
-            add_new_file_to_recent(filename)
+        if(filename):
+            for tmpfile in filename:
+                f3_name_listbox.insert(tk.END,tmpfile)
+                f3_remove_button.config(state=tk.NORMAL)
+                add_new_file_to_recent(tmpfile)
 
     def f3_remove_button_pressed():
         local=f3_name_listbox.curselection()
@@ -299,10 +306,14 @@ if __name__=="__main__":
             f3_error_message_label.config(text="")
 
     def f3_execute_button_pressed():
-        print_debug(f3_name_listbox.get(0,f3_name_listbox.size()))
-
-    def f3_decrypt_button_pressed():
-        print_debug(f3_name_listbox.get(0,f3_name_listbox.size()))
+        # if(f3_destination_button)
+        print_info("Execution Starts")
+        tmp_filenames=f3_name_listbox.get(0,f3_name_listbox.size())
+        print_info("total items : ",len(tmp_filenames))
+        print_debug("items : ",tmp_filenames)
+        # for tmpfilename in :
+            # print_debug(tmpfilename)
+        print_info("Execution Completed")
 
     def f3_select_destination_button_pressed():
         filedir=filedialog.askdirectory()
